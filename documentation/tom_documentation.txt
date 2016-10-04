@@ -1,0 +1,32 @@
+# Documentation by Tom for second paper revision
+
+## Stimuli
+
+Details on stimulus generation are contained in Saskia's original `Documentation.pdf` file. All stimuli were generated in Python and saved as `.png`. The stimuli are stored in `/code/stimuli/`. The stimuli from experiment 1 are stored in `code/stimuli/images/distorted` (the subfolder `undistorted` are provided should that be useful for model fitting). The stimuli from Experiment 2 (labelled Experiment 3 in code) are stored as:
+
+* Experiment 2a: 
+    - `/code/stimuli/exp3img0flankersdistorted`
+    - `/code/stimuli/exp3img2flankersdistorted`
+    - `/code/stimuli/exp3img4flankersdistorted`
+* Experiment 2b:
+    - `/code/stimuli/exp3bimg4flankersdistorted`
+* Experiment 2c:
+    - `/code/stimuli/exp3cimg4flankersdistorted`
+
+
+## Data analysis (final paper)
+
+The analysis materials for the final version of the paper are contained in `/results/r-analysis-final-paper/`. Here Tom put together all the other data files from Saskia's historical analysis via the script `/code/analysis/data_munging_all.R`. The manuscript / analyses use the resulting `.RData` binary file, but `.csv` files are provided in addition.
+
+Thresholds were fit via the `psignifit v4.0` toolbox. See Saskia's original "Documentation.pdf" file for those details.
+
+The computation of spectral content (Supplementary Material) was performed in Python (see `/code/analysis/spectral_content_analysis.ipynb`).
+
+Clutter metrics were computed in Matlab using Ruth Rosenholtz's clutter toolbox (link in the paper). See `/code/analysis/clutter_analysis.m`.
+
+All the subsequent plotting and analysis (other than the threshold fits via `psignifit`) are performed within the manuscript (via `knitr`). See the manuscript file 
+
+`/publications/letter_distortion_manuscript_R1.Rnw` 
+
+for all details.
+

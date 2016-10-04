@@ -1,0 +1,1644 @@
+\documentclass[doc, 11pt,a4paper,natbib]{apa6}
+% \documentclass[jou, 11pt,a4paper,natbib]{apa6}
+\usepackage[colorlinks=true,citecolor=black]{hyperref}
+\usepackage{lineno}
+
+\graphicspath{{../../figs/}}
+
+\title{
+Detecting distortions of peripherally-presented letter stimuli under crowded conditions
+}
+
+\shorttitle{Letter distortions and crowding}
+
+\fourauthors{Thomas S. A. Wallis}{Saskia Tobias}{Matthias Bethge}{Felix A. Wichmann}
+\fouraffiliations{Neural Information Processing Group, Faculty of Science, Eberhard Karls Universit\"{a}t T\"{u}bingen,
+Werner Reichardt Center for Integrative Neuroscience, Eberhard Karls Universit\"{a}t T\"{u}bingen \& the
+Bernstein Center for Computational Neuroscience, T\"{u}bingen
+}{
+Neural Information Processing Group, Faculty of Science, Eberhard Karls Universit\"{a}t T\"{u}bingen
+}{
+Werner Reichardt Center for Integrative Neuroscience, Eberhard Karls Universit\"{a}t T\"{u}bingen,
+Bernstein Center for Computational Neuroscience, T\"{u}bingen,
+Institute for Theoretical Physics, Eberhard Karls Universit\"{a}t T\"{u}bingen \& the
+Max Planck Institute for Biological Cybernetics, T\"{u}bingen
+}{
+Neural Information Processing Group, Faculty of Science, Eberhard Karls Universit\"{a}t T\"{u}bingen,
+Bernstein Center for Computational Neuroscience, T\"{u}bingen \& the
+Max Planck Institute for Intelligent Systems, Empirical Inference Department, T\"{u}bingen
+}
+
+\leftheader{Wallis, Tobias, Bethge \& Wichmann}
+
+\abstract{
+%%
+When visual features in the periphery are close together they become difficult to recognise: \textit{something} is present but it is unclear what.
+This is called ``crowding''.
+Here we investigated sensitivity to features in highly familiar shapes (letters) by applying spatial distortions.
+In Experiment 1, observers detected which of four peripherally-presented (8~deg of retinal eccentricity) target letters was distorted (spatial 4AFC).
+The letters were presented either isolated or surrounded by four undistorted flanking letters, and distorted with one of two types of distortion at a range of distortion frequencies and amplitudes.
+The bandpass noise distortion (``BPN'') technique causes spatial distortions in cartesian space, whereas radial frequency distortion (``RF'') causes shifts in polar coordinates.
+Detecting distortions in target letters was more difficult in the presence of flanking letters, consistent with the effect of crowding.
+The BPN distortion type showed evidence of tuning, with sensitivity to distortions peaking at approximately 6.5~c/deg for unflanked letters.
+The presence of flanking letters causes this peak to rise to approximately 8.5~c/deg.
+In contrast to the tuning observed for BPN distortions, RF distortion sensitivity increased as the radial frequency of distortion increased.
+In a series of follow-up experiments we found that sensitivity to distortions is reduced when flanking letters were also distorted, that this held when observers were required to report which target letter was \textit{un}distorted, and that this held when flanker distortions were always detectable.
+%These results seem to provide further support for feature averaging models of crowding, because the presence of distorted flanking features makes it more likely that target features also appear distorted (through averaging).
+%These results argue against any effect of popout for a distorted letter amongst undistorted flankers.
+The perception of geometric distortions in letter stimuli is impaired by visual crowding.
+A metric of visual clutter may provide useful directions for future modelling work.
+%%
+}
+
+\keywords{2D shape and form, spatial vision, reading, distortion, metamorphopsia}
+\authornote{
+Correspondence should be addressed to TSAW: thomas.wallis@uni-tuebingen.de.
+TSAW was supported by an Alexander von Humboldt Postdoctoral Fellowship.
+Funded, in part, by the German Federal Ministry of Education and Research (BMBF) through the Bernstein Computational Neuroscience Program T\"{u}bingen (FKZ: 01GQ1002), the German Excellency Initiative through the Centre for Integrative Neuroscience T\"{u}bingen (EXC307), and the German Science Foundation (DFG; priority program 1527, BE 3848/2-1). \\
+Word count: 6030 (excluding references and captions). \\
+Number of figures: 6 (main text), 12 (supplementary material).
+}
+
+\begin{document}
+\linenumbers
+
+\maketitle
+
+<<setup, echo=FALSE, results='hide', message=FALSE>>=
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(BayesFactor)
+library(ggthemes)
+library(gridExtra)
+@
+
+When a target object (such as a letter) is presented to the peripheral retina flanked by similar non-target objects (other letters), a human observer's ability to discriminate or identify the target object is impaired relative to conditions where no flankers are present.
+This ``crowding'' phenomenon
+\citep{andriessen_eccentric_1975,levi_vernier_1985,greenwood_positional_2009,
+bouma_interaction_1970,parkes_compulsory_2001,toet_twodimensional_1992,strasburger_dancing_2014,
+herzog_crowding_2015,harrison_unifying_2015}
+%has been demonstrated in a wide variety of tasks and stimuli, such as for orientation discrimination in Gabors, letter identification and for detecting unnatural structure in natural scenes.
+is characterised by a reduction in sensitivity to peripheral image structure.
+One way to physically change image structure is to apply spatial distortion, in which the position of local elements (pixels) are perturbed in some fashion (for example, by stretching or shifting).
+Characterising human sensitivity to spatial distortions is one way to investigate the perceptual encoding of local image structure.
+For example, showing that perception is invariant to a certain type of distortion (i.e. things look the same whether physically distorted or not) implies that the human visual system does not encode the distortion in question, either directly or indirectly.
+Arguably, measuring sensitivity to the distortion of highly familiar shapes such as letters (as we do in this paper) allows one to characterise human perception in a more complex task than (for example) grating orientation discrimination, but one that is more tractable from a modelling perspective than (for example) letter identification, which may require a full model of letter encoding.
+In addition, psychophysical investigation of spatial distortions is relevant to metamorphopsia---the perception of persistent spatial distortions in everyday life--- which is commonly associated with retinal diseases that affect the macular \citep{wiecek_metamorphopsia_2014}.
+
+Human sensitivity to spatial distortions has been investigated previously in images of faces \citep{spence_why_2014,rovamo_detection_1997,dickinson_global_2010,hole_effects_2002} and natural scenes \citep{kingdom_does_2007,bex_sensitivity_2010}.
+% some summary sentence about these studies.
+To our knowledge, only one study has assessed the impact of spatial distortion for letter stimuli.
+\citet{wiecek_metamorphopsia_2014} had observers identify letters (26-alternative identification task) distorted with bandpass noise distortion (see below) while varying the spatial scale of distortion, the letter size and the viewing distance.
+Interestingly, they report an interaction between the spatial scale of distortion (CPL; cycles per letter) and viewing distance (changing letter size), such that for small letters (subtending 0.33 degrees of visual angle) performance was worst for coarse-scaled distortions (2.4 CPL), whereas for large letters (5.4 deg) the most detrimental distortion shifted to a finer scale (4 CPL).
+This result has important implications for patients with metamorphopsia: a stable retinal distortion may affect letter recognition for some letter sizes but not others, influencing acuity assessments using letter charts \citep[a primary outcome measure for clinical vision assessment;][]{wiecek_metamorphopsia_2014}.
+
+Here we investigate sensitvity to spatial distortions in letters, under crowded (flanked) and uncrowded (unflanked) conditions.
+Note that our goal here is distinct from that of \citet{wiecek_metamorphopsia_2014}, who measured the impact of distortions on letter identification.
+We do not measure letter identification here, but instead use letters as a class of relatively simple, artifical, but highly familiar stimuli to investigate sensitivity to the presence of distortion \textit{per se}.
+We quantify the detectability of two different types of spatial distortion commonly used in the literature \citep[see also][for another distortion not employed here]{stojanoski_time_2014}.
+In bandpass noise distortions \citep[hereafter referred to as \textit{BPN} distortion;][]{bex_sensitivity_2010}, pixels are warped according to bandpass filtered noise; this ensures that the distortion occurs on a defined and limited spatial scale.
+In radial frequency distortions \citep[hereafter referred to as \textit{RF} distortion;][]{wilkinson_detection_1998, dickinson_global_2010}, the image is warped by modulating the radius (defined from the image centre) according to a sinusoidal function of some frequency defined in polar coordinates.
+For our purposes they serve to produce two different graded changes in letter images.
+A successful model of form discrimination in humans would explain sensitivity to both types of distortion and any dependence on surrounding letters (potentially, different mechanisms may be required to explain sensitivity to each distortion type).
+
+<<plot_styles, echo=FALSE>>=
+
+my_theme <- function(base_size = 12, base_family = ""){
+  # a sparse theme with box around plot
+  ret <- ggthemes::theme_base(base_family = base_family, base_size = base_size) +
+    theme(
+          legend.background = element_blank(),
+          panel.background = element_blank(),
+          # panel.border = element_blank(),
+          strip.background = element_blank(),
+          plot.background = element_blank(),
+          axis.ticks = element_line(colour = "black", size = 0.5),
+          axis.ticks.length = grid::unit(2, "points")
+          # axis.line = element_line(colour = "grey", size = 0.2)
+          # bug in ggplot 2.10 means we need to set each line separately:
+          # axis.line.x = element_line(colour = "black", size = 0.2),
+          # axis.line.y = element_line(colour = "black", size = 0.2)
+          )
+  ret
+}
+
+
+my_theme_2 <- function(base_size = 12, base_family = ""){
+  # like theme_minimal but slightly heavier gridlines, axis ticks
+  ret <- theme_minimal(base_family = base_family, base_size = base_size) +
+    theme(panel.grid.major = element_line(colour = "grey90", size = 0.4),
+          panel.grid.minor = element_line(colour = "grey98", size = 0.4)
+          # axis.ticks = element_line(colour = "black", size = 0.5),
+          # axis.ticks.x = element_line(colour = "black", size = 0.5),
+          # axis.ticks.y = element_line(colour = "black", size = 0.5),
+          # axis.ticks.length = grid::unit(2, "points")
+          )
+  ret
+}
+
+plot_theme <- function(plt, legend = TRUE){
+  # plt <- plt + theme_minimal(base_size = 10)
+  # plt <- plt + theme_base(base_size = 10)
+  plt <- plt + my_theme(base_size = 10)
+  plt <- plt + my_theme_2(base_size = 10)
+
+  if (legend == TRUE){
+    plt <- plt + scale_colour_grey(start = 0.1, end = 0.5, name = "") +
+      scale_fill_grey(start = 0.1, end = 0.5, name = "") +
+      scale_shape_discrete(name = "")
+  } else {
+    plt <- plt + scale_colour_grey(start = 0.1, end = 0.5, guide = FALSE) +
+      scale_fill_grey(start = 0.1, end = 0.5, guide = FALSE) +
+      scale_shape_discrete(name = "", guide = FALSE)
+  }
+
+  return(plt)
+}
+
+fig_width_1_col <- 3
+fig_width_2_col <- 6.8
+
+@
+
+
+\section{Experiment 1}
+
+
+\subsection{Methods}
+
+Stimuli, data and code associated with this paper are available to download from \url{http://dx.doi.org/10.5281/zenodo.48574}.
+This document was prepared using the \texttt{knitr} package \citep{xie_knitr_2013, xie_dynamic_2015} in the R statistical environment \citep{r_core_development_team_r:_2016,wickham_dplyr:_2016,wickham_ggplot2_2009,wickham_splitapplycombine_2011, auguie_gridextra:_2016, arnold_ggthemes:_2016} to increase its reproducibility.
+
+\subsubsection{Observers}
+
+Five observers with normal or corrected-to-normal vision participated in this experiment: two of the authors, one lab member and two paid observers (10 Euro per hour) who were unaware of the purpose of the study. All of the observers had prior experience with psychophysical experiments and were between 20 an 31 years of age.
+All experiments conformed to the Declaration of Helsinki.
+
+\subsubsection{Apparatus}
+
+Stimuli were displayed on a VIEWPixx LCD (VPIXX Technologies; spatial resolution $1920 \times 1200$ pixels, temporal resolution 120~Hz).
+Outside the stimulus image the monitor was set to mean grey.
+Observers viewed the display from 60~cm (maintained via a chinrest) in a darkened chamber.
+At this distance, pixels subtended approximately 0.024 degrees on average (41.5 pixels per degree of visual angle).
+The monitor was carefully linearised (maximum luminance 212~$\mathrm{cd}/ \mathrm{m}^2$) using a Gamma Scientific S470 Optometer.
+Stimulus presentation and data collection was controlled via a desktop computer (12 core i7 CPU, AMD HD7970 graphics card) running Kubuntu Linux (14.04 LTS), using the Psychtoolbox Library \citep[][version 3.0.11]{kleiner_whats_2007,pelli_videotoolbox_1997,brainard_psychophysics_1997} and our internal iShow library (\url{http://dx.doi.org/10.5281/zenodo.34217}) under MATLAB (The Mathworks, Inc., R2013B).
+Responses were collected using a RESPONSEPixx button box.
+
+\subsubsection{Stimuli}
+
+The letters stimuli were a subset of the Sloan alphabet \citep{sloan_new_1959}, used commonly on acuity charts to measure visual acuity in the clinic.
+Target letters were always the letters D, H, K and N; flanker letters were always C, O, R, and Z.
+Letter images were $64 \times 64$ pixels.
+To prevent border artifacts in distortion, each image was padded with white pixels of length 14 at each side, creating $92 \times 92$ pixel images.
+These padded letter images were distorted according to distortion maps generated from the BPN or RF algorithms (see below) in a Python (v2.7.6) environment, using Scipy's \texttt{griddata} function with linear 2D interpolation to remap pixels from the original to the distorted image.
+That is, the distortion map specifies where to move the pixels from the original image; pixel values in intermediate spaces are linearly interpolated from surrounding pixels to produce smooth distortions.
+
+\begin{figure*}
+	\centering
+   \includegraphics[scale=1]{../figures/distortion_methods.pdf}
+   \caption{
+	Distortion methods for Bandpass Noise (BPN; A--D) and Radial Frequency (RF; E--G).
+	\textbf{A:} A Sloan letter (D) with 14 pixels of white padding.
+	\textbf{B:} A sample of bandpass filtered noise, windowed in a circular cosine.
+	Two such noise samples determine the BPN distortion map.
+    \textbf{C:} The letter distorted by the BPN technique.
+    \textbf{D:} The effects of varying the frequency (columns) and amplitude (rows) of the BPN distortion.
+    \textbf{E:} An original letter image, showing the original radius $r$ from the centre to an arbitrary pixel.
+    \textbf{F:} RF distortion modulates the radius of every pixel according to a sinusoid, producing a new radius $r^\prime$.
+    \textbf{G:} The effects of varying the frequency (columns) and amplitude (rows) of the RF distortion.
+    More examples of distortions applied to letters are provided in the Supplementary Material.
+   }
+   \label{fig:distortion_methods}
+\end{figure*}
+
+\paragraph{Bandpass Noise (BPN) distortion} \citet[][see also \citep{rovamo_detection_1997, wiecek_metamorphopsia_2014}]{bex_sensitivity_2010} describes a method for generating spatial distortions that are localised to a particular spatial passband (see Figure \ref{fig:distortion_methods}A--D).
+Two random $92 \times 92$ samples of zero-mean white noise were filtered by a log exponential filter \citep[see Equation 1 in][]{bex_sensitivity_2010}:
+
+$$
+A(\omega) \propto \exp \left( - \frac{|\ln (\omega / \omega_{peak})|^3 \ln 2}{(b_{0.5} \ln2)^3} \right)
+$$
+
+where $\omega_{peak}$ specifies the peak frequency, $\omega$  is the spatial frequency and $b_{0.5}$ is the half bandwidth of the filter in octaves.
+Noise was filtered at one of six peak frequencies (2, 4, 6, 8, 16, 32 cycles per image; corresponding to 1.3, 2.6, 4, 5.3, 10.6 and 21.3 c/deg under our viewing conditions) with a bandwidth of one octave.
+The filtered noise was windowed by multiplying with a circular cosine of value one, falling to zero at the border over the space of 14 pixels, ensuring that letters did not distort beyond the borders of the padded image region.
+The amplitude of the filtered noise was then rescaled to have max / min values at 0.25, 0.5, 1, 1.5, 2, 2.5, 3, or 5 pixels; this controlled the strength of the distortion.
+For presentation of the results (thresholds, below), these amplitude units were transformed from pixels to degrees.
+One filtered noise sample controlled the horizontal pixel displacement, the other controlled vertical displacement (together giving the distortion map for the \texttt{griddata} algorithm).
+
+\paragraph{Radial Frequency (RF) distortion} Here, the distortion map was created by modulating the distance of each pixel from the centre of the padded image according to a sinusoid defined in polar coordinates \citep[see Equation 3 in][and \ref{fig:distortion_methods}E--G]{wilkinson_detection_1998}:
+
+$$
+r^\prime(\theta) = r_0 (1 + A \sin (\omega \theta + \phi))
+$$
+
+where $r^\prime$ is the distorted radius from the centre, $r_0$ the undistorted (mean) radius, $A$ is the amplitude of distortion (the proportion of the unmodulated distance from the centre), $\theta$ is the polar angle and $\omega$ is the radial frequency of distortion (here 2, 3, 4, 5, 8 or 12 cycles in $2\pi$ radians).
+The angular phase of the modulation ($\phi$) on each trial was drawn from a random uniform distribution spanning [0, $2\pi$].
+The amplitude of the distortion was set to one of 0.0075, 0.01, 0.0617, 0.1133, 0.1650, 0.2167, 0.2683 or 0.3200.
+The distortion map was windowed in a circular cosine as above, then the cosine and sine values were passed to \texttt{griddata} as the horizontal and vertical offsets.
+
+To facilitate future modelling of our experiment, we pregenerated all images presented to observers (see below) and saved them to disk.
+In total we generated 1920 images: two distortion types (BPN, RF) $\times$ two conditions (flanked, unflanked; see below) $\times$ eight amplitudes $\times$ six frequencies, each repeated 10 times.
+BPN distortions are generated from new random noise images and RF distortions with random phases, meaning that these 10 repetitions were unique images.
+Target positions, letter identities and distortions were randomised on each repeat.
+In addition, we generated the same 1920 images \textit{without} applying distortion to one of the target letters and saved them to disk.
+An image-based model of pattern recognition could be evaluated on the same stimuli as we have shown to our observers, using an undistorted ``full-reference'' image as a baseline (all images are provided online at \url{http://dx.doi.org/10.5281/zenodo.48574}).
+
+\subsubsection{Procedure}
+
+On each \textit{unflanked} trial, observers saw the four target letters and indicated the location (relative to fixation) of the distorted letter.
+The letters subtended approximately $1.5 \times 1.5$ dva and were located above, below, right and left of fixation (see Figure \ref{fig:procedure}A); letter identity at each location was randomly shuffled on each trial.
+The target letters were centred at a retinal eccentricity of 320 pixels (7.7 dva), and observers were instructed to maintain fixation on the central fixation cross \citep[best for steady fixation from][]{thaler_what_2013}.
+The entire letter array was presented on a square background of maximum luminance (side length 1024 pixels or 24.3 dva); the remainder of the monitor area was set to mean grey.
+Letter strokes were set to minimum luminance (i.e. the letters were approximately 100\% Michelson contrast).
+The letter array was presented for 150~ms (abrupt onset and offset), after which the screen was replaced with a fixation cross on the same square bright background.
+The observer had up to 2000~ms to respond (a response triggered the next trial with ITI 100~ms), and received auditory feedback as to whether their response was correct.
+
+\begin{figure*}
+	\centering
+   \includegraphics[scale=1]{../figures/procedure_display.pdf}
+   \caption{
+	Example stimulus arrays showing BPN distortions.
+	\textbf{A:} An unflanked trial example. In this example the correct response is ``above''.
+	\textbf{B:} A flanked trial example. The correct response is ``below''.
+   }
+   \label{fig:procedure}
+\end{figure*}
+
+On \textit{flanked} trials (Figure \ref{fig:procedure}B), four undistorted flanking letters the same size as the target were presented above, below, left and right of each target letter (centre-to-centre separation $1.9^\circ$, corresponding to approximately 0.25 of the eccentricity, well within the spacing of ``Bouma's law''; \citet{bouma_interaction_1970}).
+The arrangement of the four flanking letters was randomly determined on each trial.
+
+Different distortion frequencies (six levels) and amplitudes (seven levels\footnote{
+We generated stimuli for eight amplitudes but adjusted the sampling range after pilot testing to better sample the range of performance.
+All observers have done some trials at all amplitudes.
+}) were randomly interleaved within a block of trials, whereas the distortion type (BPN or RF) and letter condition (unflanked or flanked) were presented in separate blocks.
+Each pairing of frequency and amplitude was repeated 10 times (corresponding to the unique images generated above), creating 420 trials per block.
+Breaks were enforced after every 70 trials.
+Blocks of trials were arranged into four-block sessions, in which observers completed one block of each pairing of distortion type and letter condition.
+Observers always started the session with an unflanked letter condition in order to familiarise them with the task \footnote{Any practice effect should therefore improve performance in the flanked condition (this is not what we found).}.
+Each session took approximately two hours.
+All observers participated in at least four sessions.
+Before the first block of the experiment observers completed 70 practice trials to familiarise themselves with the task.
+In total we collected 20,160 trials on each of the unflanked and flanked conditions.
+
+
+\subsubsection{Data analysis}
+
+Data from each experimental condition were fit with a cumulative Gaussian psychometric function using the \textit{psignifit 4} toolbox for Matlab \citep{schutt_painfree_2016}, with the lower asymptote fixed to chance performance (0.25).
+The posterior mode of the threshold parameter (midpoint of the unscaled cumulative function) and 95\% credible intervals were calculated using the default (weak) prior settings from the toolbox.
+The 95\% credible intervals mean that the parameter value has a 95\% probability of lying in the interval range, given the data and the prior.
+Psychometric function widths (slopes) either did not vary appreciably over experimental conditions (Experiment 1) or, when they did (Experiment 2), patterns of variation showed effects consistent with the threshold estimates.
+This paper therefore presents only threshold data for brevity.
+
+
+\subsection{Results}
+
+<<import_data, echo=FALSE, cache=TRUE>>=
+top_dir <- "~/Dropbox/Projects/letter-distortion-detection"
+
+# this file output by code/analysis/data_munging_all.R:
+load(file.path(top_dir, "results", "r-analysis-final-paper", "all_data.RData"))
+@
+
+<<fit_bpn_data, echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE>>=
+inv_gauss <- function(pars, x){
+  peak_x <- pars[1]
+  peak_y <- pars[2]
+  width <- pars[3]
+  amp <- pars[4]
+  gauss = exp(- ((x - peak_x)^2 / (2 * width^2) ))
+  return(amp * (1 - gauss) + peak_y)
+}
+
+error_fun <- function(pars, x, y){
+    yhat = inv_gauss(pars, x)
+    return(sum((y - yhat)^2))  # minimise sum of squared errors
+}
+
+sub_dat <- threshold_dat_1 %>%
+  filter(distortion == "BPN")
+
+res <- optim(c(1, 1, 1, 1),
+             error_fun,
+             method = "BFGS",
+             x = sub_dat$log_freq,
+             y = sub_dat$threshold)
+
+# how fucking cool is dplyr!
+fits <- threshold_dat_1 %>%
+  filter(distortion == "BPN") %>%
+  group_by(subject, flanked) %>%
+  do(model = optim(res$par,
+                   error_fun,
+                   method = "BFGS",
+                   x = .$log_freq,
+                   y = .$threshold,
+                   control = c(maxit = 1000)))
+
+# there must be a nicer way to do this:
+preds <- expand.grid(subject = levels(fits$subject),
+                     flanked = levels(fits$flanked),
+                     x = seq(min(sub_dat$log_freq),
+                             max(sub_dat$log_freq), length.out = 30))
+
+preds <- preds %>%
+  group_by(subject, flanked) %>%
+  left_join(fits)
+
+preds$yhat <- NA
+for (i in 1 : nrow(preds)) {
+  pars <- preds$model[[i]]$par
+  preds$yhat[i] <- inv_gauss(pars, preds$x[i])
+}
+
+preds$model <- NULL
+preds$distortion <- "BPN"
+
+
+# Do summaries --------------------------
+bpn_pred <- function(x, pars){
+  return(inv_gauss(pars, x))
+}
+
+# must be a neater way...
+fits$area <- NA
+fits$peak_x <- NA
+for (i in 1 : nrow(fits)){
+  int <- integrate(bpn_pred,
+                   min(sub_dat$log_freq),
+                   max(sub_dat$log_freq),
+                   fits$model[[i]]$par)
+  fits$area[i] <- int$value
+
+  fits$peak_x[i] <- exp(fits$model[[i]]$par[1])
+}
+fits$distortion <- "BPN"
+
+@
+
+<<fit_rf_data, echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE>>=
+
+sub_dat_2 <- threshold_dat_1 %>%
+  filter(distortion == "RF")
+
+fits_2 <- threshold_dat_1 %>%
+  filter(distortion == "RF") %>%
+  group_by(subject, flanked) %>%
+  do(model = lm(threshold ~ log_freq, data = .))
+
+# there must be a nicer way to do this:
+preds_2 <- expand.grid(subject = levels(fits$subject),
+                       flanked = levels(fits$flanked),
+                       x = seq(min(sub_dat_2$log_freq),
+                               max(sub_dat_2$log_freq), length.out = 30))
+
+preds_2 <- preds_2 %>%
+  group_by(subject, flanked) %>%
+  left_join(fits_2)
+
+rf_pred <- function(x, pars){
+  return(pars[1] + x * pars[2])
+}
+
+preds_2$yhat <- NA
+for (i in 1 : nrow(preds_2)) {
+  pars <- coef(preds_2$model[[i]])
+  preds_2$yhat[i] <- rf_pred(preds_2$x[i], pars)
+}
+
+preds_2$model <- NULL
+preds_2$distortion <- "RF"
+
+# Do summaries --------------------------
+# must be a neater way...
+fits_2$area <- NA
+for (i in 1 : nrow(fits_2)){
+  int <- integrate(rf_pred,
+                   min(sub_dat_2$log_freq),
+                   max(sub_dat_2$log_freq),
+                   coef(fits_2$model[[i]]))
+  fits_2$area[i] <- int$value
+}
+fits_2$distortion <- "RF"
+
+@
+
+<<cap-expt-1-results, echo=FALSE, cache=TRUE>>=
+cap <- paste0("Results of Experiment 1.
+              Top panels show threshold amplitude for detecting letters distorted with BPN distortions, as a function of distortion frequency (c/deg) for five observers.
+	Note both the x- and y-axes are logarithmic.
+	Points show the posterior MAP estimate for the psychometric function threshold; error bars show 95\\% credible intervals.
+	Thresholds are higher (observers are less sensitive to distortions) when flanking letters are present (light triangles) compared to unflanked conditions (dark circles).
+	Additionally, thresholds appear to show tuning, being lowest at approximately 6--8 c/deg.
+	Lines show fits of a Gaussian function to the log frequencies and linear thresholds (see text for details).
+ Bottom row of panels show RF distortions.
+	Flanking letters again impair performance.
+	Unlike in the BPN distortions, for RF distortions performance simply worsens for higher distortion frequencies.
+  Lines show fits of a linear model to the log frequencies and linear thresholds.
+	The reader can appreciate these results for themselves by examining how distortion visibility changes as a function of frequency in Figure \\ref{fig:distortion_methods}D and G.
+              ")
+@
+
+<<expt-1-results, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=3.5, fig.cap=cap, fig.env="figure*">>=
+
+freq_breaks <- c(1, 2, 4, 8, 16, 32)
+
+# top panel ----------------------------------------------
+plt_dat_1 <- threshold_dat_1 %>% filter(distortion == "BPN")
+
+plt1 <- ggplot(plt_dat_1, aes(x = log_freq, y = threshold,
+                                   colour = flanked, shape = flanked)) +
+  facet_grid(distortion ~ subject, scales = "free_y") +
+  geom_errorbar(aes(ymin = threshold - threshconfi_low,
+                    ymax = threshold + threshconfi_high),
+                width = 0) +
+  geom_point() +
+  geom_line(data = preds, aes(x = x, y = yhat)) +
+  scale_y_log10(name = "Threshold", breaks = c(0.01, 0.02, 0.04, 0.08, 0.16, 0.32)) +
+  scale_x_continuous(name = "Frequency (c/deg)", breaks = log(freq_breaks), labels = freq_breaks)
+
+plt1 <- plot_theme(plt1, legend = FALSE)
+plt1 <- plt1 + theme(panel.margin = unit(1, "lines"))
+
+# bottom panel ----------------------------------------------
+plt_dat_2 <- threshold_dat_1 %>% filter(distortion == "RF")
+
+plt2 <- ggplot(plt_dat_2, aes(x = log_freq, y = threshold,
+                                   colour = flanked, shape = flanked)) +
+  facet_grid(distortion ~ subject, scales = "free_y") +
+  geom_errorbar(aes(ymin = threshold - threshconfi_low,
+                    ymax = threshold + threshconfi_high),
+                width = 0) +
+  geom_point() +
+  geom_line(data = preds_2, aes(x = x, y = yhat)) +
+  scale_y_log10(name = "Threshold", breaks = c(0.01, 0.02, 0.04, 0.08, 0.16, 0.32)) +
+  scale_x_continuous(name = "Frequency (c/2pi)", breaks = log(freq_breaks), labels = freq_breaks)
+
+plt2 <- plot_theme(plt2) + theme(legend.position = c(0.08, 0.2),
+                               legend.margin = unit(1, units = "pt"))
+
+plt2 <- plt2 + theme(panel.margin = unit(1, "lines"))
+
+grid.arrange(plt1, plt2)
+@
+
+Thresholds for detecting the distorted target letter are shown in Figure \ref{fig:expt-1-results}.
+For both distortion types, observers were less sensitive to letter distortion (thresholds were higher) when the target letters were surrounded by four flanking letters (light triangles) compared to when targets were isolated (dark circles).
+This pattern is an example of crowding.
+Furthermore, we observe that the two distortion types (BPN and RF) show different dependencies on their respective frequency parameters (which are not themselves comparable).
+RF distortions become easier to detect the higher their frequency (c / $2\pi$ radians).
+BPN distortions show evidence of tuning, such that thresholds are lowest for frequencies in the range of 4--10 c/deg and rise for both lower and higher frequencies (note the log-log scaling in Figure \ref{fig:expt-1-results}).
+To quantify these effects, we fit curves to the thresholds as a function of the log distortion frequency (BPN: four-parameter Gaussian fit by minimising the sum of squared errors with the BFGS method of R's \texttt{optim} function\footnote{Note that these four-parameter functions are rather unconstrained by only six data points, and are intended as a rough guide to the patterns in the data rather than a definitive statement about tuning. A more robust estimate could be gained by fitting a mixed effects model.}; RF: linear model fit with R's \texttt{lm} function; see lines in Figure \ref{fig:expt-1-results} for model fits).
+
+<<t-tests, echo=FALSE, warning=FALSE>>=
+
+# bpn area ------------------------------------
+x <- fits$area[fits$flanked == "unflanked"]
+y <- fits$area[fits$flanked == "flanked"]
+
+bpn_means <- fits %>%
+  group_by(flanked) %>%
+  summarise(mean = round(mean(area), 2),
+            sd = round(sd(area), 2))
+bpn_ttest <- t.test(x, y, paired = TRUE)
+bpn_bf <- ttestBF(x, y, paired = TRUE)
+
+# bpn peak ------------------------------------
+x <- fits$peak_x[fits$flanked == "unflanked"]
+y <- fits$peak_x[fits$flanked == "flanked"]
+
+peaks_means <- fits %>%
+  group_by(flanked) %>%
+  summarise(mean = round(mean(peak_x), 2),
+            sd = round(sd(peak_x), 2))
+peaks_ttest <- t.test(x, y, paired = TRUE)
+peaks_bf <- ttestBF(x, y, paired = TRUE)
+
+# rf area ------------------------------------
+x <- fits_2$area[fits$flanked == "unflanked"]
+y <- fits_2$area[fits$flanked == "flanked"]
+
+rf_means <- fits_2 %>%
+  group_by(flanked) %>%
+  summarise(mean = round(mean(area), 2),
+            sd = round(sd(area), 2))
+rf_ttest <- t.test(x, y, paired = TRUE)
+rf_bf <- ttestBF(x, y, paired = TRUE)
+
+print_ttest <- function(ttest, bf){
+  string <- paste0("t(",
+                   ttest$parameter,
+                   ") = ",
+                   abs(round(ttest$statistic, 2)),
+                   ", p = ",
+                   signif(ttest$p.value, 2),
+                   ", BF = ",
+                   round(exp(bf@bayesFactor$bf), 1))
+  return(string)
+}
+
+@
+
+To quantify the overall decrease in performance caused by the presence of flanking letters, we examined how the area under these curves (estimated numerically) changed from unflanked to flanked conditions\footnote{While for the linear model we could directly compare intercepts and slopes, the area provides a simple measure that also accounts for different curvature in the Gaussian model.}.
+Larger areas mean higher thresholds (i.e. lower sensitivity).
+We quantify these differences using paired t-tests of both frequentist and Bayesian \citep{rouder_default_2012, morey_bayesfactor_2015} flavours.
+For the BPN distortion type,
+flanking letters raised the mean area under the Gaussian threshold curve from
+\Sexpr{bpn_means$mean[bpn_means$flanked == "unflanked"]}
+(SD = \Sexpr{bpn_means$sd[bpn_means$flanked == "unflanked"]}) to
+\Sexpr{bpn_means$mean[bpn_means$flanked == "flanked"]}
+(SD = \Sexpr{bpn_means$sd[bpn_means$flanked == "flanked"]});
+\Sexpr{print_ttest(bpn_ttest, bpn_bf)}.
+For the RF distortion type,
+flanking letters raised the mean area under the linear fit from
+\Sexpr{rf_means$mean[rf_means$flanked == "unflanked"]}
+(SD = \Sexpr{rf_means$sd[rf_means$flanked == "unflanked"]}) to
+\Sexpr{rf_means$mean[rf_means$flanked == "flanked"]}
+(SD = \Sexpr{rf_means$sd[rf_means$flanked == "flanked"]});
+\Sexpr{print_ttest(rf_ttest, rf_bf)}.
+Thus both crowding effects we observe appear reasonably robust.
+
+<<cap-expt-1-areas, echo=FALSE>>=
+# cap <- paste0("Area under the threshold curves from Figure \\ref{fig:expt-1-results}
+#               as a function of distortion type and flanked / unflanked condition.
+#               Higher values (larger areas) mean higher thresholds (lower sensitivity).
+#               Lines link the values for individual observers.
+#               Flanking letters cause higher thresholds for all observers in both distortion types.
+#               ")
+@
+
+<<expt-1-areas, echo=FALSE, cache=TRUE, fig.width=fig_width_1_col, fig.height=3, fig.cap=cap>>=
+# a1 <- fits %>%
+#   select(subject = subject,
+#          flanked = flanked,
+#          distortion = distortion,
+#          area = area)
+#
+# a2 <- fits_2 %>%
+#   select(subject = subject,
+#          flanked = flanked,
+#          distortion = distortion,
+#          area = area)
+# areas <- rbind(a1, a2)
+#
+# plt <- ggplot(areas, aes(x = flanked, y = area)) +
+#   facet_wrap(~ distortion, ncol = 1, scales = "free_y") +
+#   geom_line(aes(group = subject), alpha = 0.5) +
+#   xlab("") +
+#   scale_y_continuous(name = "Area under threshold curve")
+#
+# plt <- plot_theme(plt)
+# plt <- plt + theme(panel.margin = unit(1, "lines"))
+# plt
+@
+
+Next we consider the peak distortion frequency at which thresholds were lowest for the BPN distortions (there is no peak in our data for the RF distortions).
+There was a reasonable effect of flanking, such that when flanking letters were present, distortion sensitivity peaked at higher frequencies
+(M = \Sexpr{peaks_means$mean[peaks_means$flanked == "flanked"]} c/deg,
+SD = \Sexpr{peaks_means$sd[peaks_means$flanked == "flanked"]})
+than when target letters were unflanked
+(M = \Sexpr{peaks_means$mean[peaks_means$flanked == "unflanked"]},
+SD = \Sexpr{peaks_means$sd[peaks_means$flanked == "unflanked"]}; a difference in
+peaks of
+\Sexpr{round(log2(peaks_means$mean[peaks_means$flanked == "flanked"] / peaks_means$mean[peaks_means$flanked == "unflanked"]), 2)}
+octaves;
+\Sexpr{print_ttest(peaks_ttest, peaks_bf)}).
+While the effect is therefore large compared to the relevant error variance, note that it ignores the precision with which the peak frequency is determined by the data, and so should be interpreted with a degree of caution.
+
+<<cap-expt-1-peaks, echo=FALSE>>=
+# cap <- paste0("Lines link the peak frequency of lowest thresholds from the BPN distortion data (Figure \\ref{fig:expt-1-results}) for each observer in the flanked and unflanked conditions.
+# 	Flanking letters cause peak sensitivity to occur at higher frequencies.
+#               ")
+@
+
+
+<<expt-1-peaks, echo=FALSE, cache=TRUE, fig.width=fig_width_1_col, fig.height=2, fig.cap=cap>>=
+# plt <- ggplot(fits, aes(x = flanked, y = peak_x)) +
+#   geom_line(aes(group = subject), alpha = 0.5) +
+#   xlab("") +
+#   scale_y_continuous(name = "Peak frequency (c/deg)")
+#
+#
+# plt <- plot_theme(plt)
+# plt <- plt + theme(panel.margin = unit(1, "lines"))
+# plt
+@
+
+\section{Experiment 2}
+
+Our first experiment showed that sensitivity to both BPN and RF distortions was reduced in the presence of undistorted flanking letters.
+Interestingly, our observers reported experiencing ``pop-out'' in the flanked condition, such that the distorted letter appeared relatively more salient than the three undistorted targets by virtue of its contrast with neighbouring undistorted flankers.
+That is, the distorted letter strokes appeared subjectively more noticable when next to undistorted strokes.
+While the data quantitatively argue against such a pop-out effect (since flanking letters impaired performance), we nevertheless decided to conduct a series of follow-up experiments to determine whether there was any dependence of the thresholds on the kind of flankers employed.
+Flankers more similar to the target are known to cause stronger crowding \citep[e.g.][]{bernard_dependence_2011, kooi_effect_1994}; it is therefore plausible that distorted flankers would produce even greater performance impairment.
+
+
+We test this hypothesis in three related sub-experiments.
+Because we will directly compare the data from each experiment, we present the similarities and differences in the experimental procedures first, followed by all data collectively.
+Three of the observers from Experiment 1 (two authors plus one lab member) participated in these experiments; all other experimental procedures were as in Experiment 1 except as noted below.
+As in Experiment 1, all test images were pregenerated and saved along with undistorted reference images to facilitate future modelling work.
+
+
+\begin{figure*}
+	\centering
+   \includegraphics[scale=1]{../figures/experiment_2_methods.pdf}
+   \caption{
+	Example stimulus displays from Experiment 2 (all examples show the BPN distortion type at high distortion amplitudes).
+	In Experiment 2a, observers detected the distorted middle letter when surrounded by zero (\textbf{A}), two (\textbf{B}) or four (\textbf{C}) distorted flankers.
+	\textbf{D:} In Experiment 2b, observers indicated the \textit{un}distorted middle letter surrounded by four distorted flankers.
+    \textbf{E:} In Experiment 2c, flankers were always distorted at a highly-detectable distortion level.
+    The correct response in panels A--E are down, left, down, left and right.
+   }
+   \label{fig:expt_2_methods}
+\end{figure*}
+
+\subsection{Methods}
+
+\subsubsection{Experiment 2a: varying the number of distorted flankers}
+
+This experiment was identical to Experiment 1, with the primary exception that in some trials either two or four of the flanker letters in every letter array (above, left, below and right) were also distorted (see Figure \ref{fig:expt_2_methods}A--C).
+That is, observers reported the location of the distorted target letter, sometimes in the presence of distorted flankers.
+If distorted targets pop out from undistorted flankers \textit{and} undistorted targets pop out from distorted flankers (\textit{symmetrical popout}), we might expect that settings in which two of four flankers are distorted would be hardest.
+In the case of no undistorted flankers (i.e. the same as the flanked condition in Experiment 1), the distorted target pops out from the flankers.
+In the case of four distorted flankers, the \textit{un}distorted targets pop out in three of the four possible locations, alerting the observer to the correct response by elimination.
+Finally, when two flanking letters are distorted, any differential pop-out signal is minimised because the nontarget letter arrays contain two distorted letters whereas the letter array corresponding to the correct response contains three distorted letters.
+This account would therefore predict that thresholds in the two distorted flanker letter condition should be higher than those for zero or four distorted flankers.
+
+In this experiment we selected one distortion frequency for each distortion type: 2.6 c/deg for the BPN and 4 c/$2\pi$ for the RF distortions.
+Because our pilot testing indicated these tasks were more difficult than those in Experiment 1, we generated distortions at higher amplitudes than those in the first experiment: 0.024, 0.048, 0.072, 0.096, 0.120, 0.144, and 0.168 for BPN and 0.05, 0.125, 0.2, 0.275, 0.25, 0.425 and 0.5 for RF.
+Flanking letters were distorted with the same frequency and amplitude distortion as the target letter on every trial.
+
+Trials of different distortion types (BPN, RF) and flanker conditions (zero, two or four distorted flankers) were presented in separate blocks in which each of the seven amplitudes were randomly interleaved.
+Ten unique images were created for each amplitude, each repeated three times to give 30 trials per amplitude (210 per block).
+Blocks of trials were arranged into six-block sessions, consisting of each distortion type and flanker condition in a random order for each observer.
+All observers participated two sessions, creating a total of 7560 trials.
+
+\subsubsection{Experiment 2b: detect the undistorted letter in the presence of distorted flankers}
+
+In Experiment 1, observers detected which of four letters was distorted when surrounded by four undistorted flanking letters.
+In Experiment 2b we examine the inverse task: to detect which middle letter is \textit{un}distorted in the presence of four distorted flankers (Figure \ref{fig:expt_2_methods}D).
+If distortion detection is symmetric, performance in this condition should be as good as in the zero distorted flanker condition of Experiment 2a.
+That is, distorted letters should pop out from undistorted flankers just as undistorted letters pop out from distorted flankers.
+The procedure was otherwise identical to Experiment 2a, with the exception that observers did two blocks (BPN and RF distortion types) of 210 trials (totalling 1260 trials).
+
+\subsubsection{Experiment 2c: flanker distortion at fixed high amplitude}
+
+In Experiments 2a and 2b, flanker distortions had the same amplitude as the target letter distortion.
+Therefore, for low target distortion amplitudes the flanker distortions were also subthreshold.
+Popout, if it exists, may require detectable levels of distortion in the flanking elements.
+To test this question we repeated the four distorted flanker condition from Experiment 2a, with the exception that the flankers were distorted at a fixed amplitude that rendered distortions easily detectable (0.144 c/deg for BPN, 0.425 c/$2\pi$ for RF; see Figure \ref{fig:expt_2_methods}E).
+If popout requires suprathreshold distortions in flanking letters then sensitivity in this condition should be higher than the four distorted flanker condition from Experiment 2a (i.e. more similar to the zero distorted flanker condition for Experiment 2a).
+Observers performed at least two blocks, one for each distortion type (2520 trials total).
+
+
+\subsection{Results}
+
+<<cap-expt-2-results, echo=FALSE, cache=TRUE>>=
+cap <- paste0("Results of Experiment 2.
+	Top panels show threshold amplitude for detecting the target letter as a function of the number of distorted flankers, for three observers in the BPN distortion condition (Experiment 2a).
+	Note the logarithmic y-axis.
+	Points show the posterior MAP estimate for the psychometric function threshold; error bars show 95\\% credible intervals.
+	Points for four distorted flankers have been shifted in the x direction to aid visibility.
+  Bottom panels show the same as the top for RF distortions.
+")
+@
+
+<<expt-2-results, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=3.5, fig.cap=cap, fig.env="figure*">>=
+
+plt <- ggplot(threshold_dat_2, aes(x = n_dist_flanks, y = threshold,
+                                   colour = experiment, shape = experiment)) +
+  facet_grid(distortion ~ subject, scales = "free_y") +
+  geom_errorbar(aes(ymin = threshold - threshconfi_low,
+                    ymax = threshold + threshconfi_high),
+                width = 0,
+                position = position_dodge(width = 0.8)) +
+  geom_point(position = position_dodge(width = 0.8)) +
+  scale_y_log10(name = "Threshold", breaks = c(0.02, 0.04, 0.08, 0.16, 0.32, 0.64)) +
+  scale_x_continuous(name = "No. distorted flankers", breaks = c(0, 2, 4))
+
+plt <- plot_theme(plt)
+plt <- plt + theme(legend.position = c(0.85, 0.05),
+                   legend.margin = unit(1, units = "pt"),
+                   legend.direction = "horizontal")
+
+plt <- plt + theme(panel.margin = unit(1, "lines"))
+
+plt
+@
+
+Threshold levels of distortion are shown in Figure \ref{fig:expt-2-results}.
+The results for the BPN and RF distortions show qualitatively similar effects of the experimental conditions.
+First, thresholds increase as more flanking letters are distorted: detecting distortions in arrays with two or four distorted flankers is more difficult than when no flankers are distorted (Experiment 2a; Figure \ref{fig:expt-2-results} circles).
+There is therefore no support for the prediction that thresholds would be higher in the two distorted flanker condition which, had it occurred, would be consistent with targets popping out from (un)distorted flankers in the zero and four distorted flanker conditions.
+
+The results of Experiment 2b (Figure \ref{fig:expt-2-results}, triangles) also provided no support for symmetrical popout.
+There was no evidence that detecting an undistorted target letter amongst four distorted flankers was as difficult as the zero distorted flanker condition of Experiment 2a; instead, thresholds for detecting the undistorted target letter were more similar to those for detecting a distorted target letter amongst four distorted flankers.
+
+Finally, thresholds in Experiment 2c (Figure \ref{fig:expt-2-results}, squares) show that detecting a distorted letter amongst four distorted flankers requires substantially more distortion amplitude than those with no distorted flankers (Experiment 2a with no distorted flankers), despite the flanker distortions always being easily detectable.
+This result confirms the absence of symmetrical popout found in Experiments 2a and 2b: it is not the case that the three undistorted targets pop out from their distorted surrounds (which if it occurred would allow the observer to choose the correct response by selecting the array with no popout).
+
+It is additionally interesting to consider the pattern of results for Experiment 2c relative to the other four letter distorted flanker conditions.
+Here we see opposite patterns of results for the BPN and RF distortions.
+For BPN distortions, Experiment 2c produces the highest thresholds compared to the other experiments, suggesting that highly visible flanker distortions produce even stronger masking.
+Conversely, for the RF distortions Experiment 2c thresholds are lowest of the other four-distorted-flanker data in two of three observers.
+This could reflect some facilitation for this distortion type, but given the inconsistency between observers we would want to collect more data before drawing strong conclusions.
+
+\section{Discussion}
+
+<<threshold_comparison, echo=FALSE>>=
+bpn_thresholds_1 <- threshold_dat_1 %>%
+  filter(flanked == "flanked" & distortion == "BPN" & freq == 2.6) %>%
+  summarise(mean = mean(threshold), sd = sd(threshold))
+
+bpn_thresholds_2 <- threshold_dat_2 %>%
+  filter(distortion == "BPN" & n_dist_flanks == 4 & experiment == "a") %>%
+  summarise(mean = mean(threshold), sd = sd(threshold))
+
+rf_thresholds_1 <- threshold_dat_1 %>%
+  filter(flanked == "flanked" & distortion == "RF" & freq == 4.0) %>%
+  summarise(mean = mean(threshold), sd = sd(threshold))
+
+rf_thresholds_2 <- threshold_dat_2 %>%
+  filter(distortion == "RF" & n_dist_flanks == 4 & experiment == "a") %>%
+  summarise(mean = mean(threshold), sd = sd(threshold))
+
+@
+
+
+We have measured human sensitivity to geometric distortions of letter stimuli presented to the peripheral retina.
+For two types of distortion, Experiment 1 showed that distortion sensitivity is reduced when target letters are surrounded by task-irrelevant flankers.
+This result is therefore an example of crowding \citep{bouma_interaction_1970}.
+In the follow-up studies of Experiment 2 we found that this impairment became more severe\footnote{
+For the BPN distortions, the average threshold in the flanked condition for Experiment 1 at a frequency of 2 c/deg was
+\Sexpr{round(bpn_thresholds_1$mean, 2)} (SD = \Sexpr{round(bpn_thresholds_1$sd, 2)}),
+whereas with four distorted flankers (Experiment 2a) the average threshold at the same frequency was
+\Sexpr{round(bpn_thresholds_2$mean, 2)} (SD = \Sexpr{round(bpn_thresholds_2$sd, 2)};
+a factor of \Sexpr{round(bpn_thresholds_2$mean / bpn_thresholds_1$mean, 1)} times larger).
+Similarly, in Experiment 1 the threshold for RF distortions at 4 $\mathrm{c}/2\pi$ was
+\Sexpr{round(rf_thresholds_1$mean, 2)} (SD = \Sexpr{round(rf_thresholds_1$sd, 2)}) whereas the same frequency with four distorted flankers in Experiment 2a was
+\Sexpr{round(rf_thresholds_2$mean, 2)} (SD = \Sexpr{round(rf_thresholds_2$sd, 2)};
+a factor of \Sexpr{round(rf_thresholds_2$mean / rf_thresholds_1$mean, 1)} times larger).
+} when flanking letters were themselves distorted -- i.e. we do not find evidence of distortion ``pop-out''.
+That distortion sensitivity can be crowded is perhaps unsurprising; nevertheless, we find it worthwhile to demonstrate the impairment and measure its strength.
+The second result is more curious, because a consideration of the stimulus dimensions that may underlie distortion detection suggests we should have found the opposite result.
+
+
+\subsection{Relevance to crowding}
+
+Crowding has previously been shown to exist for both letter identification
+\citep{bouma_interaction_1970, pelli_crowding_2004, chung_spatialfrequency_2002, estes_similarity-related_1982}
+and orientation discrimination
+\citep{andriessen_eccentric_1975, parkes_compulsory_2001, wilkinson_lateral_1997, pelli_crowding_2004, harrison_unifying_2015}.
+Our experiments could be considered to probe an intermediate level of representation: geometric distortions can change the contours of these simple but highly familiar shapes.
+
+It is therefore relevant to ask what more primitive dimensions might underlie the effects we report.
+Detecting deviations from expected shape potentially involves local orientation processing, position, curvature, contour alignment and spatial frequency changes.
+%(though note that \citet{wilkinson_detection_1998} rule out local orientation processing, curvature and spatial frequency change as possible explanations for radial frequency sensitivity in their narrowband contour stimuli).
+What does the crowding literature tell us about these potential cues?
+As mentioned above, there is strong evidence from a number of studies that local orientation processing is impaired by crowding.
+Sensitivity to local position \citep{dakin_probabilistic_2010,greenwood_positional_2009,greenwood_crowding_2012}, spatial frequency \citep{wilkinson_lateral_1997}, curvature \citep{kramer_simple_1996}, and contour alignment \citep{robol_role_2012, dakin_context_2009, may_ladder_2007, chakravarthi_same_2011} is also impaired by flanking elements.
+Some or all of these potential cues could therefore be related to the effects we observe.
+
+% target-flanker similarity:
+%Detection sensitivity under crowded conditions can depend on target-flanker similarity in orientation \citep{wilkinson_lateral_1997}.
+
+% similarity literature:
+% estes_similarity-related_1982 -- "similarity" refers to "similar" vs "dissimilar" letters, chosen subjectively.
+% wilkinson_lateral_1997 -- very elevated thresholds for spatial freq and contrast discrim when targets and flankers have similar orientations (Figs 7 and 8)
+% parkes_compulsory_2001 -- cw / ccw orientation discrim much worse when flankers are orthogonal compared to close (how does this result fit?)
+% ivry_effect_1991 -- similarity in colour, shape increase illusory conjunction errors. Crowding? Not periphery.
+% kooi_effect_1994 -- similarity in contrast polarity, shape, depth, colour
+% bernard_dependence_2011 -- thorough characterisation of letter complexity and similarity via confusion matrices. Errors increase with target-flanker similarity.
+% chung_spatialfrequency_2001 -- target-flanker similarity effect in spatial frequency. asymmetric similarity for contrast: flankers with lower contrast than targets crowd less, flankers with higher contrast crowd more.
+% chakravarthi_same_2011 -- misaligned Gabors impair letter identification but improve phase discrimination. That is, aligned elements ("good continuation") are more easily crowded.
+% glen_orientationcrowding_2013 --
+% livne_configuration_2007,livne_how_2010, herzog_crowding_2015,manassi_when_2013,saarela_global_2009, sayim_grouping_2013 -- similarity effects may be mediated by "grouping" over different spatial scales.
+
+% target-flanker similarity at level of "distortedness":
+The results from our second experiment show that distorted targets do not pop out from undistorted flankers (and vice versa).
+This is interesting in light of the extensively-documented effects of target-flanker similarity in crowding
+\citep{estes_similarity-related_1982, wilkinson_lateral_1997, kooi_effect_1994, bernard_dependence_2011, chung_spatialfrequency_2001, chakravarthi_same_2011, glen_orientationcrowding_2013, livne_configuration_2007, livne_how_2010, herzog_crowding_2015, manassi_when_2013, saarela_global_2009, sayim_grouping_2013}.
+% The results of our experiments could also be considered from the perspective of target-flanker similarity.
+If we define ``similarity'' at the level of ``distortedness'', then in Experiment 1 the distorted target becomes less similar to the undistorted flankers as distortion amplitude increases.
+The degree of target-flanker similarity in the non-target letter arrays is constant, and determined only by the confusability of the undistorted letters in those arrays.
+The same holds true for Experiment 2a in the zero distorted flankers condition.
+When the four flankers are also distorted in Experiment 2a, the similarity between target and flankers in the target array is held constant (as the target becomes distorted with increasing amplitude, so do the flankers), whereas in the non-target letter arrays the central (undistorted) letters and the distorted flankers become less similar.
+If observers were able to use this decreasing similarity to rule out the non-target arrays, we would expect them to be sensitive to the target location.
+Instead their thresholds are much higher relative to the zero distorted flankers case.
+Experiment 2c provides the opposite case to Experiment 1: because flankers were distorted with a strong amplitude distortion, then as distortion amplitude in the target letter increases, it becomes more similar to the flankers.
+Therefore, target-flanker similarity effects defined at the level of ``distortedness'' do not appear to be generally consistent with the patter of results we observe.
+
+A more parsimonious account consistent with the results of Experiment 2 is that performance decays as the ``complexity'' of the stimulus array increases (under the assumption that flanker distortion increases complexity)
+\footnote{We would like to credit a discussion with Daniel Coates that resulted in this (post-hoc) account of our data.}.
+When all four flanking letters were distorted (Figure \ref{fig:expt-2-results}), thresholds for target detection were higher than other conditions whether the observers were trying to discriminate a distorted middle letter from undistorted ones (Experiment 2a), the undistorted middle letter from distorted middle letters (Experiment 2b) or the distorted middle letter in the presence of strong flanker distortions (Experiment 2c).
+Flanker distortion increases complexity, making the task more difficult.
+Letter complexity effects have indeed been demonstrated to play a distinct role from target-flanker similarity in crowded letter identification \citep{bernard_dependence_2011}, an effect attributed to the number of features to be detected within a character \citep[see also][]{pelli_feature_2006, suchow_learning_2012}.
+It seems plausible then that in our Experiment 2, it is difficult to detect distorted letters in the presence of distorted flankers because of feature crowding.
+
+<<cap-clutter-1, echo=FALSE, cache=TRUE>>=
+cap <- paste0("An image-based clutter metric \\citep[feature congestion;][]{rosenholtz_measuring_2007} applied to stimuli from Experiment 2a.
+Higher values of the metric correspond to more cluttered images.
+Points show the clutter value averaged over letters and unique stimuli for the highest amplitudes shown to observers.
+For this amplitude, clutter increases with the number of distorted flankers, qualitatively mirroring the human data in Figure \\ref{fig:expt-2-results}.
+As more flankers are distorted, the image becomes more cluttered (``complex'') and human performance declines (though these clutter patterns depend on distortion amplitude; see Supplementary Material).
+")
+@
+
+<<clutter-1, echo=FALSE, cache=TRUE, fig.width=fig_width_1_col, fig.height=2, fig.cap=cap, fig.env="figure">>=
+# this file output by code/analysis/data_munging_clutter_results:
+load(file.path(top_dir, "results", "clutter_analysis", "clutter_data.RData"))
+
+plt_dat <- clutter_dat_2 %>%
+  filter((amplitude == 7.0 | amplitude == 0.5) & measure == "FC") %>%
+  group_by(n_dist_flanks, distortion) %>%
+  summarise(y = mean(clutter))
+
+plt <- ggplot(plt_dat, aes(x = n_dist_flanks, y = y)) +
+  facet_grid(~ distortion) +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Feature congestion") +
+  scale_x_continuous(name = "No. distorted flankers", breaks = c(0, 2, 4))
+
+plt <- plot_theme(plt, legend = FALSE)
+plt <- plt + theme(panel.margin = unit(1, "lines"))
+plt
+@
+
+
+% clutter:
+The model of letter complexity presented by \citet{bernard_dependence_2011} requires a letter skeleton to be known (their paper compared different fonts).
+We require an image-based metric.
+We made a coarse attempt to quantify the complexity account above by investigating whether two metrics of visual clutter \citep{rosenholtz_measuring_2007} could qualitatively mimic the effects---on the assumption that a complex display is a cluttered display.
+\textit{Feature congestion} is a multiscale measure of the covariance of the luminance contrast, orientation and colour in a given input image.
+\textit{Subband entropy} is determined by the bitdepth required for wavelet image encoding, expressed as Shannon entropy in bits.
+These metrics have previously been associated with performance in tasks such as visual search \citep{asher_regional_2013, henderson_influence_2009, rosenholtz_measuring_2007}.
+
+Intriguingly, the feature congestion metric does qualitatively mimic the pattern of results observed in Experiment 2a (Figure \ref{fig:clutter-1}): distorting flanking letters increases the clutter of the display, similarly to the increased thresholds for humans in Figure \ref{fig:expt-2-results}.
+In addition, with a few caveats, feature congestion loosely matches the pattern of human sensitivity as a function of distortion frequency from Experiment 1 (Supplementary Material).
+Note however that these patterns represent only a relatively tiny change in the metric (at maximum a value of $\approx 0.03$), whereas adding flanking letters increases the metric by about 1 compared to an unflanked display (see Supplementary Material).
+This is clearly out-of-scale for the relatively large threshold increases in Experiment 2a.
+Nevertheless, integrating the feature congestion clutter metric might be useful in efforts to model our results more comprehensively.
+
+% averaging vs substitution:
+Two dominant classes of crowding models are ``averaging'' models, in which crowding occurs because task-relevant features from the target and flankers are averaged together, and ``substitution'' models in which properties of the flankers are sometimes mistakenly reported as properties of the target.
+% An averaging account of our experiments might predict that undistorted contours of the non-target middle letters will appear more distorted by virtue of lying nearby the distorted flankers (e.g. in Experiment 2c), thus reducing the perceived difference between distorted and undistorted middle letters and reducing performance.
+% In other words, the mechanism(s) that cause crowding make the targets \textit{appear} more like the flankers \citep{greenwood_crowding_2010}.
+% Increasing the number of distorted flankers (as in Experiment 2a) also reduces the difference signal available, if averaging depends on the number of nearby distorted contours.
+% In contrast, a substitution model might hold that observers encode the target and flanker features (in this case, distortedness) accurately, but will sometimes confuse the flankers and the target and thus report the flanker characteristic on some trials.
+% Our results therefore seem more consistent with averaging than with substitution models of crowding.
+% A substitution model could account for our results if the substituting observer \textit{only} has access to the distortedness of the four letters perceived to be at the target location (whether or not these are targets or substituted flankers).
+% A more realistic assumption would be that the observer can tell whether flanker letters are also distorted.
+% In this case, the observer should be able to respond correctly because they would know which array of five letters contains the oddball letter, irrespective of whether a flanker is substituted for a target.
+The present study was not designed to discriminate between these accounts of crowding, and it is somewhat unclear what predictions models of either class would make for our results (can the appearance of distortion be substituted?).
+Interestingly, recent work shows that because both averaging- and substitution-like errors can be accounted for under a simple population coding model and decision criterion, observing either of these behaviours experimentally does not necessarily discriminate between mechanisms \citep[at least for orientation discrimination; ][]{harrison_unifying_2015}.
+It may be fruitful to consider what such a letter-agnostic population coding model might predict for our experiments.
+
+\subsection{Relevance to other investigations of distortions}
+
+How do our results fit with previous investigations of human perception of these two distortion types?
+We first consider BPN distortions.
+Our Experiment 1 revealed that distortion sensitivity is tuned to mid-range distortion frequencies (approximately 6--9 c/deg).
+\citet{bex_sensitivity_2010} also found bandpass tuning for detecting BPN distortions introduced into one quadrant of natural scenes.
+Observers were maximally sensitive to distortions of approximately 5~c/deg, and these peaks were relatively stable for distortions centred at retinal eccentricities of 1.5, 2.8 and 5.6~deg.
+These estimates are at the lower bound of those we observe here.
+This might suggest that distortion detection sensitivity in letter stimuli peaks at higher spatial scales than detecting distortions of natural scene content.
+However, the results of \citet{wiecek_metamorphopsia_2014} imply that the peaks we observe will also depend on letter size, so it may not be generally meaningful to compare the peaks we observe to those of \citet{bex_sensitivity_2010}.
+
+In \citet{wiecek_metamorphopsia_2014}, letters of different sizes were presented foveally, and participants identified the letter after BPN distortion.
+Letter identification performance showed different tuning for distortion frequency at different letter sizes.
+Filtering with a peak frequency of 8~c/deg produced poorest identification performance for letters subtending 0.33~deg.
+These results fit with our data, if we assume that when a distortion is maximally detectable (peak sensitivities in our experiment) it maximally reduces letter identification (\citet{wiecek_metamorphopsia_2014}); the difference in letter size likely reflects a size scaling constant in detectability as letters move away from the fovea \citep{chung_spatialfrequency_2002, song_double_2014}.
+
+What causes the bandpass tuning for BPN distortions?
+Potentially, sensitivity to whatever primitive feature dimensions are used to detect the distortions (e.g. contrast, curvature changes) also follow a bandpass shape.
+Note however that an analysis of the spatial frequency and orientation energy changes induced by distortions (Supplemental Material) reveals no obvious relationship to performance for those dimensions.
+Additionally, BPN distortions of sufficient amplitude (when the pixel shift exceeds half the distortion wavelength) will cause reversals in pixel positions, producing ``speckling'' at high frequencies but leaving the mean position of low frequency components unchanged (see for example Figure \ref{fig:distortion_methods}D, the highest amplitude distortions for the two highest frequencies).
+The bandpass tuning might reflect sensitivity to this speckling: detecting high frequency distortions requires detecting high frequency speckles (see also spectral analysis in the Supplemental Material), which are difficult to see in the periphery due to acuity loss \footnote{We credit Peter Bex for pointing out the likely relevence of speckling to the observed tuning.}.
+Thresholds therefore rise again compared to mid-frequency distortions, which observers can detect well before speckling occurs.
+Experiment 1 also showed that when flankers are present, peak sensitivity shifts to higher frequencies than when flankers are absent.
+This could be because flanking letters selectively reduce sensitivity to position changes at lower spatial scales, or because flanking letters increase sensitivity to higher-frequency speckles.
+Given that there is no plausible mechanism that might support the latter possibility, we favour the former.
+
+
+<<rf_thresholds, echo=FALSE>>=
+rf2 <- threshold_dat_1 %>%
+  filter(distortion == "RF" & freq == 2.0 & flanked == "unflanked") %>%
+  summarise(mean = mean(threshold), median = median(threshold))
+@
+
+% relationship to other RF findings
+As to RF distortions,
+\citet{wilkinson_detection_1998} measured thresholds for detecting RF distortions applied to spatially-bandpass circular shapes as a function of radial distortion frequency.
+They found that threshold amplitudes decreased as radial frequency increased as we do, but with a different pattern in which thresholds appeared to asymptote for higher frequencies.
+For RF1 patterns (which we do not test in our study), thresholds were $\approx 0.2$, for RF2 patterns thresholds dropped to $\approx 0.01$, and for higher frequencies (3--24 $\mathrm{c}/2\pi$) thresholds asymptoted at an average amplitude of $0.003$ (in the ``hyperacuity'' range).
+Thresholds in our data (Experiment 1 unflanked condition) were much higher (for example, average thresholds for our RF2 patterns were $\approx \Sexpr{round(rf2$mean, 2)}$, which is about fifteen times higher than in their data).
+This is likely because distortions in our experiment were applied to more complex shapes (letters as opposed to bandpass circles) that were presented peripherally (whereas in Wilkinson et al's experiment stimuli were nearer to the fovea).
+Nevertheless, there is little evidence that the asymptotic sensitivities in their results also hold in ours.
+This may be because the asymptote occurs for higher radial frequencies in the periphery, which conceivably reflects an interaction between the image content of our letter stimuli and the sensitivity of the peripheral retina.
+\citet[][see also \citet{dickinson_rapidly_2012}]{dickinson_global_2010} applied RF distortions to complex broadband images (faces) but did not characterise the radial frequency sensitivity function of these manipulations, so their results are not informative for this question.
+
+\subsection{Caveats}
+
+The experiments in the present paper should be considered with a number of caveats.
+First, we measure performance for a single target-flanker spacing distance.
+While this distance was selected to be well within ``Bouma's law'' for crowding, and we indeed find an influence of flanking letters, our data provide only a snapshot of the spatial interference profile for these stimuli.
+Successful models could also be expected to account for the spatial extent of crowding for letter distortions, and so measuring the spatial interference zones would be a useful experimental contribution.
+In the interests of brevity we leave those investigations to future studies.
+
+Second, our results do not allow a direct comparison between the two distortion techniques.
+The frequency and amplitude parameters for each distortion type represent different physical image changes.
+Radial frequency distortions are highly correlated both tangentially and radially, whereas BPN distortions are not, and these correlations will interact with the original structure of the letter.
+Each distortion type produces different patterns of human sensitivity as a function of its distortion parameters.
+Therefore, the distortions and psychophysical results we present here define distinct physical shape changes that produce different patterns of sensitivity, providing a challenge for future accounts of shape perception.
+
+% generality of findings: BPN
+Finally, the generality of our results should be considered with a degree of caution.
+The detectability of a given distortion will depend on the image content to which it is applied (for example, distorting a blank image region results in no image change).
+In our experiments we used only four target letter stimuli.
+This choice was motivated by the fact that our intention was not to quantify the visibility of distortions across a broad range of stimuli, but to investigate sensitivity in highly familiar simple patterns.
+Nevertheless, the research discussed above \citep{bex_sensitivity_2010, wiecek_metamorphopsia_2014} corroborates the pattern of bandpass tuning we observe for the BPN distortions in our small set of letter stimuli, suggesting that this pattern applies more generally than just our limited stimulus set.
+As to RF distortions, we cannot say with any degree of certainty how the patterns of RF sensitivity we observe will generalise to new stimuli, because the previous investigations we are aware of either have not characterised distortion sensitivity as a function of frequency, or have done so in much simpler stimuli (see above).
+
+\subsection{Other implications}
+% metamorphopsia implications:
+The results of \citet{wiecek_metamorphopsia_2014} imply that the visibility and functional impairment caused by distortions originating in the retina (such as in metamorphopsia) will depend on viewing distance.
+Alongside the functional impact of these distortions for the patients in the real world, this result has important consequences for visual acuity testing in the clinic.
+Interestingly, patients with metamorphopsia often fail to notice their distortions in the real world \citep{wiecek_metamorphopsia_2015} and even when tested with artificially-regular stimuli \citep{crossland_amsler_2007,schuchard_validity_1993,wiecek_metamorphopsia_2015}.
+``Filling-in'' processes \citep{crossland_amsler_2007} and binocular masking \citep{wiecek_metamorphopsia_2015} undoubtedly contribute to this insensitivity.
+To the extent that the results we report here are generalisable (see above), they \citep[along with][]{bex_sensitivity_2010} offer an additional explanation for why patients with metamorphopsia often fail to notice their distortions: in the real world, distortions caused by retinal disease will often be crowded by cluttered visual environments.
+
+
+\section{Conclusion}
+
+Taken together, the pattern of results presented here provide a challenge for models of 2D form processing in humans.
+A successful model of form discrimination would need to explain sensitivity to two distinct distortion types, the dependence of distortion sensitivity on flanking letters, and the dependence on the type of flanking letters (distorted flankers reduce sensitivity).
+Directly comparing the BPN and RF distortions would require an image-based similarity metric that captured the perceptual size of the distortions on a common scale.
+One test of such a similarity metric would be to rescale the results of the BPN and RF data reported here such that the different sensitivity patterns as a function of distortion frequency overlap (assuming that they are detected by a common mechanism).
+The metric of feature congestion \citep{rosenholtz_measuring_2007} qualitatively captures some of these features (see Supplementary Material) and may present a useful starting point for a more complete model.
+We have provided our raw data and images of the stimuli used in these experiments (\url{http://dx.doi.org/10.5281/zenodo.48574}) to facilitate future efforts along these lines.
+
+
+\section{Acknowledgements}
+
+Designed the experiments: TSAW, ST, FAW, MB.
+Programmed the experiments: ST, TSAW.
+Collected the data: ST, TSAW.
+Analysed the data: TSAW, ST.
+Wrote the paper: TSAW.
+Revised the paper: ST, FAW, MB.
+We thank Peter Bex and William Harrison for helpful comments on the manuscript.
+
+\newpage
+
+\section{Supplemental material}
+
+\subsection{Difficulty of individual target letters}
+
+<<cap-expt-1-letters, echo=FALSE>>=
+cap <- "Performance for each target letter in each distortion type and flanking condition.
+	Points show the average proportion correct across observers (error bars show $\\pm 1$ SE) for each target letter in each distortion type, averaged over frequencies and amplitudes.
+  Lines link the performance of individual observers.
+	The letters K and H show slightly higher performance than D and N, for both distortion types, and this trend appears slightly stronger for flanked than unflanked trials.
+	This could reflect an interaction between letter shape and distortion (i.e. it is easier to discriminate distortions applied to the letter K), differential similarities of the target and flanking letters, or biases in preferred letter irrespective of location."
+@
+
+<<expt-1-letters, echo=FALSE, cache=TRUE, fig.width=fig_width_1_col, fig.height=2.5, fig.cap=cap>>=
+subj_means <- raw_dat_1 %>%
+  group_by(subject, distortion, targ_letter, flanked) %>%
+  summarise(pc = mean(correct))
+
+plt <- ggplot(subj_means, aes(x = targ_letter, y = pc)) +
+  facet_grid(flanked ~ distortion) +
+  geom_hline(yintercept = 1/4, linetype = "dotted")
+
+# add lines for each subject:
+for (i in 1 : length(levels(subj_means$subject))){
+  this_subj <- levels(subj_means$subject)[i]
+  this_dat <- subj_means %>% filter(subject == this_subj)
+  plt <- plt + geom_line(data = this_dat, aes(group = distortion),
+                         position = position_dodge(width = 0.5), alpha = 0.4)
+}
+
+plt <- plt + stat_summary(fun.data = "mean_se",
+                          position = position_dodge(width = 0.5),
+                          size = 0.1)
+
+plt <- plot_theme(plt) +
+  scale_y_continuous(name = "Proportion correct", breaks = c(0, 0.5, 1), limits = c(0, 1)) +
+  xlab("Target Letter")
+plt
+@
+
+Because the effect of an image-based distortion depends on the image content, we note that performance varied slightly according to the target letter (Figure \ref{fig:expt-1-letters}).
+On average across observers, it was easier to detect distortions applied to the letters K and H than the letters D and N, for both distortion types.
+Note however that the comparisons in Figure \ref{fig:expt-1-letters} conflate distortion sensitivity and response bias.
+Because each letter is presented on every trial (with the distortion applied to only one of the letters), an observer with a bias to choose a particular letter when in doubt (irrespective of its location) would also serve to raise proportion correct performance (or thresholds).
+Thus, biases that are consistent across observers could also produce differences in letter performance.
+Measuring sensitivity to distortions in each letter while eliminating bias would require a forced-choice on individual letters (e.g. which of these ``K''s is distorted?).
+Nevertheless, we find this possibility unlikely because it would require observers to identify the location of their preferred letter and respond accordingly---it therefore seems more plausible that response biases would occur for response locations rather than for letter identities.
+Another possible explanation for different letter sensitivities is revealed by considering that the advantage for K and H appears larger in flanked than unflanked conditions.
+These effects could depend on the relative similarity of the target letters and the four flanking letters, which have been shown to influence letter identification under crowded conditions \citep{bernard_dependence_2011,hanus_quantifying_2013}.
+
+\subsection{Analysis of spatial frequency and orientation spectra}
+\label{sec:energy_appendix}
+
+To gain insight into the physical changes caused by the letter distortions that may underlie the results we observe, we examined how the different distortions change the spatial frequency and orientation energy spectra of the stimuli.
+If observers were able to perform the task by simply detecting spectral changes in the target letters, then we would expect the physical changes caused by the distortions to mirror the patterns of sensitivity from Experiment 1.
+Specifically, for BPN distortions we should observe a bandpass tuning of the relevant dimension (peaking for middle distortion frequencies) whereas for RF distortions we should observe a spectral change that increases with distortion frequency.
+
+We computed the Fourier amplitude spectrum of each target letter image ($92 \times 92$ pixels),
+then calculated the radial energy (averaging over angle) and angular energy (averaging over radius) by applying Gaussian sliding windows (using the
+\texttt{spectral\_analysis}
+function from Psyutils v1.3.1: \url{http://dx.doi.org/10.5281/zenodo.60212}).
+These correspond to the spatial frequency and orientation energies respectively.
+We performed this operation for the undistorted target letters, and for letters distorted with BPN and RF distortions with frequencies as in Experiment 1 and for three distortion amplitudes: the amplitude corresponding to the average threshold for the unflanked condition, the flanked condition, and for the maximum distortion we applied in Experiment 1.
+Within each combination of conditions we generated 15 unique distorted letters (i.e. with different noise patterns for BPN and different phases for RF) in order to capture the average effect of the distortions.
+
+For spatial frequency energy, high-frequency BPN distortions increased the contrast energy in high spatial frequencies ($\approx$ 8--16 c/deg; see Figure \ref{fig:sf-energy-bpn}) compared to the undistorted letter, for all letters.
+Even if we assume that these frequencies are easily detectable at the $\approx 8$ degrees of retinal eccentricity used in our study, it seems unlikely that observers benefit from this increased contrast energy because thresholds for these conditions were higher than those for lower frequency distortions (i.e., BPN distortion sensitivity follows a bandpass shape).
+High frequency RF distortions also increased high spatial frequency energy (Figure \ref{fig:sf-energy-rf}), but not as much as for BPN distortions (Figure \ref{fig:sf-energy-compare}).
+RF distortions of 5 and 8 $\mathrm{c} / 2\pi$ also increased frequencies in the mid SF range (4--8 c/deg; more easily seen in Figure \ref{fig:sf-energy-compare}), but again this increased contrast energy appears unrelated to psychophysical performance.
+Considering these results across the two distortion types, it seems unlikely that changes in spatial frequency energy could underlie human performance in our experiment.
+For example, if observers were using the increase in high spatial frequency energy to perform the task, then we would expect thresholds in the high frequency BPN conditions to continue declining; instead they increase again.
+
+For orientation energy, both BPN (Figure \ref{fig:ori-energy-bpn}) and RF (Figure \ref{fig:ori-energy-rf}) distortions have the effect of increasing energy at all orientations relative to the original letter stimulus (making the distribution of orientation energy less peaked) as distortion frequency increased.
+This effect is much more pronounced for the BPN distortions compared to the RF distortions (Figure \ref{fig:ori-energy-compare}) at the highest distortion frequency.
+Again, this pattern of physical stimulus changes holds no obvious relationship to psychophysical performance.
+If observers used changes in the orientation energy to detect the distorted letter, then for BPN distortions we would expect these changes to be greatest for F4 or F5 (5.3 or 10.6 c/deg) for the flanked condition, and for RF distortions we would expect the energy change to increase with distortion frequency.
+Instead, the highest BPN frequency has the largest relative effect on orientation energy, and if anything the effect of RF distortions are greatest for middle distortion frequencies (F4 or F5; Figure \ref{fig:ori-energy-compare}).
+
+Finally, we can consider whether differences in frequency or orientation energy might underlie the slightly different performance for target letters, in which observers were more sensitive to K and H than D and N for both distortion types (Figure \ref{fig:expt-1-letters}).
+The largest changes in both spatial frequency and orientation energy are observed for H and N (Figures \ref{fig:sf-energy-compare} and \ref{fig:ori-energy-compare}), which provides little evidence one way or the other.
+At least, there is no strong evidence that changes in spatial frequency or orientation energy drive differential performance for these target letters.
+
+<<load_spectra_data, echo=FALSE, cache=TRUE>>=
+sf_energy <- read.csv(file.path(top_dir, "results", "spectral_analysis", "sf_energy.csv"))
+ori_energy <- read.csv(file.path(top_dir, "results", "spectral_analysis", "ori_energy.csv"))
+
+sf_energy$flanked <- factor(sf_energy$flanked, levels = c("unflanked", "flanked", "max"))
+ori_energy$flanked <- factor(ori_energy$flanked, levels = c("unflanked", "flanked", "max"))
+
+# reorder letters:
+sf_energy$letter <- factor(sf_energy$letter,
+                           levels = c("K", "H", "D", "N"))
+
+ori_energy$letter <- factor(ori_energy$letter,
+                            levels = c("K", "H", "D", "N"))
+
+# set undistorted "rep" to a value:
+sf_energy$rep[sf_energy$letter_type == "Undistorted"] = -1
+
+# set undistorted "rep" to a value:
+ori_energy$rep[ori_energy$letter_type == "Undistorted"] = -1
+
+# categorical frequencies:
+sf_energy$freq_cat <- factor(sf_energy$freq)
+sf_energy$freq_cat <- mapvalues(sf_energy$freq_cat,
+                                levels(sf_energy$freq_cat),
+                                c("F1", "F1", "F2", "F2", "F3",
+                                  "F4", "F4", "F5", "F5", "F6", "F6"))
+
+ori_energy$freq_cat <- factor(ori_energy$freq)
+ori_energy$freq_cat <- mapvalues(ori_energy$freq_cat,
+                                levels(ori_energy$freq_cat),
+                                c("F1", "F1", "F2", "F2", "F3",
+                                  "F4", "F4", "F5", "F5", "F6", "F6"))
+
+
+@
+
+
+<<cap-sf-energy-bpn, echo=FALSE>>=
+cap <- paste0("Spatial frequency energy in letter stimuli with BPN distortions.
+              Panels are arranged by target letter (rows) and distortion frequency (columns).
+              Black curves show the spectrum of the undistorted letter; coloured curves show the
+              spectra for letters distorted at threshold levels for unflanked and flanked conditions, as
+              well as the maximum distortion used in Experiment 1.")
+@
+
+<<sf-energy-bpn, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=4, fig.cap=cap, message=FALSE, fig.env="figure*">>=
+# x_breaks <- c(1.4375, 2.875, 5.75, 11.5, 23, 46)  # cycles per image
+# x_labels <- round(x_breaks / (92 / 41.5), 1)  # cycles per degree.
+
+x_labels <- c(1, 2, 4, 8, 16)  # cycles per degree
+x_breaks <- x_labels * (92 / 41.5)
+
+plot_dat <- sf_energy %>%
+  filter(distortion != "RF")
+
+plt <- ggplot(plot_dat, aes(x = x, y = y, colour = flanked)) +
+  facet_grid(letter ~ freq)
+
+# line for undistorted:
+undistorted_dat <- plot_dat %>% filter(letter_type == "Undistorted")
+plt <- plt + geom_line(data=undistorted_dat, aes(colour = NULL), colour = "black")
+
+# average over reps, plot for each threshold value
+distorted_dat <- plot_dat %>%
+  filter(letter_type == "Distorted") %>%
+  group_by(flanked, freq, letter, x) %>%
+  summarise(mean = mean(y))
+plt <- plt + geom_line(data = distorted_dat, aes(y = mean))
+
+# add a single exemplar distortion:
+# single_dat <- plot_dat %>%
+#   filter(rep == 0 & flanked == "max")
+# plt <- plt + geom_line(data = single_dat, color = "red", linetype = "dashed")
+
+plt <- plt +
+  scale_x_log10(name = "Spatial frequency (c/deg)", breaks = x_breaks, labels = x_labels) +
+  scale_y_log10(name = "Contrast energy (arbitrary units)")
+
+plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "seq", palette = "OrRd") +
+  theme(legend.position = "top")
+
+plt
+@
+
+<<sf-energy-bpn-diff, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=4.3, fig.cap=cap, message=FALSE, fig.env="figure*">>=
+# x_labels <- c(1, 2, 4, 8, 16)  # cycles per degree
+# x_breaks <- x_labels * (92 / 41.5)
+#
+# # testing:
+# # test_set <- sf_energy %>%
+# #   filter(distortion != "RF" & flanked == "max" & freq == 21.3 & letter == "K")
+# #
+# # blah <- test_set %>%
+# #   group_by(flanked, freq, letter, x) %>%
+# #   mutate(diff = y - y[rep == -1])
+#
+# # holy moly dplyr is awesome:
+# # takes the difference between the undistorted and other
+# # traces, then averages over reps:
+# # plot_dat <- sf_energy %>%
+# #   filter(distortion != "RF") %>%
+# #   group_by(flanked, freq, letter, x) %>%
+# #   mutate(diff = y - y[rep == -1]) %>%
+# #   filter(letter_type == "Distorted")
+#
+# # ratio of energies:
+# plot_dat <- sf_energy %>%
+#   filter(distortion != "RF") %>%
+#   group_by(flanked, freq, letter, x) %>%
+#   mutate(diff = y / y[rep == -1]) %>%
+#   filter(letter_type == "Distorted")
+#
+# plt <- ggplot(plot_dat, aes(x = x, y = diff, colour = flanked)) +
+#   facet_grid(letter ~ freq) +
+#   geom_hline(yintercept = 1, linetype = "dotted", colour = "black")
+#
+# # a line for every rep?
+# for (i in 0 : 14){
+#   this_dat <- plot_dat %>% filter(rep == i)
+#   plt <- plt + geom_line(data = this_dat, alpha = 0.4)
+# }
+#
+# plt <- plt +
+#   scale_x_log10(name = "Spatial frequency (c/deg)", breaks = x_breaks, labels = x_labels) +
+#   scale_y_continuous(name = "Contrast energy ratio (distorted / undistorted)")
+#
+# plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "seq", palette = "OrRd") +
+#   theme(legend.position = "top")
+#
+# plt
+@
+
+
+<<cap-sf-energy-rf, echo=FALSE>>=
+cap <- paste0("Spatial frequency energy in letter stimuli with RF distortions. Plot elements
+              as in Figure \\ref{fig:sf-energy-bpn}.")
+@
+
+<<sf-energy-rf, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=4, fig.cap=cap, message=FALSE, fig.env="figure*">>=
+
+plot_dat <- sf_energy %>%
+  filter(distortion != "BPN")
+
+plt <- ggplot(plot_dat, aes(x = x, y = y, colour = flanked)) +
+  facet_grid(letter ~ freq)
+
+# line for undistorted:
+undistorted_dat <- plot_dat %>% filter(letter_type == "Undistorted")
+plt <- plt + geom_line(data=undistorted_dat, aes(colour = NULL), colour = "black")
+
+# average over reps, plot for each threshold value
+distorted_dat <- plot_dat %>%
+  filter(letter_type == "Distorted") %>%
+  group_by(flanked, freq, letter, x) %>%
+  summarise(y = mean(y))
+plt <- plt + geom_line(data = distorted_dat)
+
+# add a single exemplar distortion:
+# single_dat <- plot_dat %>%
+#   filter(rep == 1 & flanked == "max")
+# plt <- plt + geom_line(data = single_dat, color = "red", linetype = "dashed")
+
+plt <- plt +
+  scale_x_log10(name = "Spatial frequency (c/deg)", breaks = x_breaks, labels = x_labels) +
+  scale_y_log10(name = "Contrast energy (arbitrary units)")
+
+plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "seq", palette = "OrRd") +
+  theme(legend.position = "top")
+plt
+@
+
+
+<<cap-sf-energy-compare, echo=FALSE>>=
+cap <- paste0("Ratio of spatial frequency energy between undistorted and distorted letters,
+               for BPN and RF distortions, at amplitudes corresponding to average flanked thresholds.
+               Each faint line shows a unique distortion.
+               Distortion frequencies have been categorised into the lowest (F1) to highest (F6) shown for each
+               distortion type.
+               High-frequency BPN distortions increase contrast energy at high spatial frequencies.")
+@
+
+<<sf-energy-compare, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=4, fig.cap=cap, message=FALSE, fig.env="figure*">>=
+x_labels <- c(1, 2, 4, 8, 16)  # cycles per degree
+x_breaks <- x_labels * (92 / 41.5)
+
+# testing:
+# test_set <- sf_energy %>%
+#   filter(distortion != "RF" & flanked == "max" & freq == 21.3 & letter == "K")
+#
+# blah <- test_set %>%
+#   group_by(flanked, freq, letter, x) %>%
+#   mutate(diff = y - y[rep == -1])
+
+# ratio of energies:
+plot_dat <- sf_energy %>%
+  filter(flanked == "flanked") %>%
+  group_by(distortion, freq_cat, letter, x) %>%
+  mutate(diff = y / y[rep == -1]) %>%
+  filter(letter_type == "Distorted")
+
+plt <- ggplot(plot_dat, aes(x = x, y = diff, colour = distortion)) +
+  facet_grid(letter ~ freq_cat) +
+  geom_hline(yintercept = 1, linetype = "solid", colour = "black")
+
+# a line for every rep?
+for (i in 0 : 14){
+  this_dat <- plot_dat %>% filter(rep == i)
+  plt <- plt + geom_line(data = this_dat, alpha = 0.4)
+}
+
+plt <- plt +
+  scale_x_log10(name = "Spatial frequency (c/deg)", breaks = x_breaks, labels = x_labels) +
+  scale_y_continuous(name = "Contrast energy ratio (distorted / undistorted)")
+
+plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "qual", palette = "Set1") +
+  theme(legend.position = "top")
+
+plt
+@
+
+<<cap-ori-energy-bpn, echo=FALSE>>=
+cap <- paste0("Orientation energy in letter stimuli with BPN distortions.
+              Polar coordinates have been rotated relative to the orientation of the
+              raw amplitude spectra so as to be more intuitive.
+              To gain an intuition for the orientation, consider the original spectrum for the letter ``N''.
+              Imagining an upright ``N'', one can see most energy at vertical orientation and also on the
+              diagonal corresponding to the diagonal stroke in the letter.
+              Panels and plot elements as in Figure \\ref{fig:sf-energy-bpn}.")
+@
+
+<<ori-energy-bpn, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=5, fig.cap=cap, message=FALSE, fig.env="figure*">>=
+# x_breaks <- c(0, pi/2, pi, 3*pi/2)  # cycles per image
+# x_labels <- c(0, expression(paste0(pi, "/2")),
+#               expression(paste0(pi)),
+#               expression(paste0("3", pi, "/2")))
+
+
+plot_dat <- ori_energy %>%
+  filter(distortion != "RF")
+
+plt <- ggplot(plot_dat, aes(x = x, y = y, colour = flanked)) +
+  facet_grid(letter ~ freq)
+
+# line for undistorted:
+undistorted_dat <- plot_dat %>% filter(letter_type == "Undistorted")
+plt <- plt + geom_line(data=undistorted_dat, aes(colour = NULL), colour = "black")
+
+# average over reps, plot for each threshold value
+distorted_dat <- plot_dat %>%
+  filter(letter_type == "Distorted") %>%
+  group_by(flanked, freq, letter, x) %>%
+  summarise(y = mean(y))
+plt <- plt + geom_line(data = distorted_dat)
+
+# # add a single exemplar distortion:
+# single_dat <- plot_dat %>%
+#   filter(rep == 1 & flanked == "max")
+# plt <- plt + geom_line(data = single_dat, color = "blue", linetype = "dashed")
+
+
+plt <- plt +
+  coord_polar(theta = "x", direction = -1) +
+  # scale_x_continuous(name = "Orientation", breaks = x_breaks, labels = x_labels) +
+  scale_x_continuous(name = "Orientation", breaks = NULL) +
+  scale_y_log10(name = "Contrast energy (arbitrary units)", breaks = NULL)
+
+plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "seq", palette = "OrRd") +
+  theme(legend.position = "top")
+plt
+@
+
+<<cap-ori-energy-rf, echo=FALSE>>=
+cap <- paste0("Orientation energy in letter stimuli with RF distortions.
+              As for Figure \\ref{fig:ori-energy-bpn}.")
+@
+
+<<ori-energy-rf, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=5, fig.cap=cap, message=FALSE, fig.env="figure*">>=
+# x_breaks <- c(0, pi/2, pi, 3*pi/2)  # cycles per image
+# x_labels <- c(0, expression(paste0(pi, "/2")),
+#               expression(paste0(pi)),
+#               expression(paste0("3", pi, "/2")))
+
+plot_dat <- ori_energy %>%
+  filter(distortion != "BPN")
+
+plt <- ggplot(plot_dat, aes(x = x, y = y, colour = flanked)) +
+  facet_grid(letter ~ freq)
+
+# line for undistorted:
+undistorted_dat <- plot_dat %>% filter(letter_type == "Undistorted")
+plt <- plt + geom_line(data=undistorted_dat, aes(colour = NULL), colour = "black")
+
+# average over reps, plot for each threshold value
+distorted_dat <- plot_dat %>%
+  filter(letter_type == "Distorted") %>%
+  group_by(flanked, freq, letter, x) %>%
+  summarise(y = mean(y))
+plt <- plt + geom_line(data = distorted_dat)
+
+# # add a single exemplar distortion:
+# single_dat <- plot_dat %>%
+#   filter(rep == 1 & flanked == "max")
+# plt <- plt + geom_line(data = single_dat, color = "blue", linetype = "dashed")
+
+plt <- plt +
+  coord_polar(theta = "x", direction = -1) +
+  # scale_x_continuous(name = "Orientation", breaks = x_breaks, labels = x_labels) +
+  scale_x_continuous(name = "Orientation", breaks = NULL) +
+  scale_y_log10(name = "Contrast energy (arbitrary units)", breaks = NULL)
+
+plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "seq", palette = "OrRd") +
+  theme(legend.position = "top")
+plt
+@
+
+<<cap-ori-energy-compare, echo=FALSE>>=
+cap <- paste0("Ratio of orientation energy between undistorted and distorted letters,
+               for BPN and RF distortions, at amplitudes corresponding to average flanked thresholds.")
+@
+
+<<ori-energy-compare, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=5, fig.cap=cap, message=FALSE, fig.env="figure*">>=
+
+# ratio of energies:
+plot_dat <- ori_energy %>%
+  filter(flanked == "flanked") %>%
+  group_by(distortion, freq_cat, letter, x) %>%
+  mutate(diff = y / y[rep == -1]) %>%
+  filter(letter_type == "Distorted")
+
+plt <- ggplot(plot_dat, aes(x = x, y = diff, colour = distortion)) +
+  facet_grid(letter ~ freq_cat) +
+  geom_hline(yintercept = 1, linetype = "solid", colour = "black")
+
+# a line for every rep?
+for (i in 0 : 14){
+  this_dat <- plot_dat %>% filter(rep == i)
+  plt <- plt + geom_line(data = this_dat, alpha = 0.4)
+}
+
+plt <- plt +
+  coord_polar(theta = "x", direction = -1) +
+  scale_x_continuous(name = "Orientation", breaks = NULL) +
+  scale_y_continuous(name = "Contrast energy ratio")
+
+plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "qual", palette = "Set1") +
+  theme(legend.position = "top")
+
+plt
+@
+
+\subsection{Clutter metric analysis}
+
+In an attempt to provide some quantitative basis for our speculations about display complexity as an account for the results of our second experiment, we here apply two metrics for ``clutter'' to our stimulus displays \citep{rosenholtz_measuring_2007}.
+The first metric, \textit{feature congestion}, is a multiscale measure of the covariance of three features: the luminance contrast, orientation and colour in a given input image.
+The second metric, \textit{subband entropy}, is determined by the bitdepth required for wavelet image encoding, expressed as Shannon entropy in bits.
+For both metrics, higher values are associated with more ``cluttered'' images.
+These metrics have been shown to be predictive of aspects of visual search performance across a variety of domains \citep{asher_regional_2013, henderson_influence_2009, rosenholtz_measuring_2007}.
+
+To assess clutter in our displays we used the publically-available code from \citet[][see \url{https://dspace.mit.edu/handle/1721.1/37593}]{rosenholtz_measuring_2007}.
+We analysed all the images used in both experiments.
+In all cases we report the scalar clutter metric (averaged over space in the image to give one number per stimulus display).
+Figure \ref{fig:expt-1-clutter} shows the results for Experiment 1.
+While both metrics qualitatively reproduce the effect of adding flanking letters (clutter increases in the ``flanked'' condition), neither metric produces the qualitative pattern of results as a function of frequency (bandpass patterns for BPN distortions or decreasing clutter as frequency increases for RF distortions), at least at the scale of the increase caused by adding flanking letters.
+
+In Figure \ref{fig:expt-1-clutter-rescaled} we plot only the flanked condition, and separate the clutter values according to distortion amplitude.
+This rescaling allows us to see several potentially interesting patterns in the feature congestion results (subband entropy shows little evidence of any pattern consistent with human data).
+For the RF distortions at high amplitudes, clutter increases as a function of distortion frequency (except for a dip at $4 c/2\pi$, which there is also some weak evidence for in the human data).
+Feature congestion in the BPN condition for high amplitudes shows some evidence of bandpass tuning (though peaking at lower frequencies than the peaks in the human data).
+If humans are sensitive to differences in feature congestion on this scale, they might perform the task by picking the most ``cluttered'' of the four letter arrays (and thus, higher clutter leads to better performance).
+In other words, inverting the feature congestion patterns shows a loose qualitative relationship to the shape of human thresholds as a function of distortion frequency.
+
+Can the clutter metrics account for the influence of the number of distorted flankers (Experiment 2)?
+The change in clutter caused by applying distortions to zero, two or four flankers is shown in Figure \ref{fig:expt-2-clutter}.
+The feature congestion metric shows a similar pattern of results as humans for high distortion amplitudes.
+That this holds only for high distortion amplitudes is not surprising because for low amplitudes both the target and the flankers are hardly altered (recall that in Experiment 2a flanker distortion and target distortions were yoked).
+However, note that this implies the opposite relationship to thresholds as for the discussion of clutter metrics applied to Experiment 1.
+That is, here thresholds increase as clutter increases, whereas for Experiment 1 they decrease.
+When detecting a distorted target amongst undistorted letters (Experiment 1), observers may pick the more cluttered letter array as containing the target, and thus more clutter is associated with better performance.
+When detecting a distorted target amongst distorted flankers (Experiment 2a), more clutter (caused primarily by the four distorted flankers, which are uninformative about the target location) is conversely associated with worse performance.
+If observers apply the same strategy in both experiments, the additional clutter caused by distorted flankers may make the clutter signal of the target less visible (a form of crowding).
+
+Taken together, these results suggest that investigating feature congestion as a metric for building a more comprehensive model of our task might be fruitful.
+One potential problem is that the scale of the clutter changes corresponding to patterns of frequency (Experiment 1) or distorted flankers (Experiment 2) is tiny compared to the influence of adding flanking letters in the first place.
+A better model would need to account for these changes to predict thresholds.
+
+<<cap-expt-1-clutter, echo=FALSE, cache=TRUE>>=
+cap <- paste0("Clutter analysis of Experiment 1.
+            Feature congestion (FC) and subband entropy (SE) clutter metrics for our BPN and RF distortion
+images as a function of distortion frequency and flanked / unflanked display.
+Points linked by lines show the value of the metric averaged over distortion amplitudes (which had little effect on
+clutter at this scale), letters and unique stimuli.
+Flanking letters substantially increase visual clutter.
+              ")
+@
+
+<<expt-1-clutter, echo=FALSE, cache=TRUE, fig.width=fig_width_1_col, fig.height=5, fig.cap=cap, fig.env="figure">>=
+
+freq_breaks <- c(1, 2, 4, 8, 16, 32)
+
+clutter_dat_1$log_freq <- log(clutter_dat_1$freq)
+
+# top panel ----------------------------------------------
+plt_dat_1 <- clutter_dat_1 %>%
+  filter(distortion == "BPN") %>%
+  group_by(log_freq, flanked, distortion, measure) %>%
+  summarise(y = mean(clutter))
+
+plt1 <- ggplot(plt_dat_1, aes(x = log_freq, y = y,
+                              colour = flanked, shape = flanked)) +
+  facet_grid(measure ~ distortion) +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Clutter", breaks = c(0.5, 1, 1.5, 2, 2.5)) +
+  scale_x_continuous(name = "Frequency (c/deg)", breaks = log(freq_breaks), labels = freq_breaks)
+
+plt1 <- plot_theme(plt1, legend = FALSE)
+plt1 <- plt1 + theme(panel.margin = unit(1, "lines"))
+
+# bottom panel ----------------------------------------------
+freq_breaks <- c(2, 4, 8, 12)
+
+plt_dat_2 <- clutter_dat_1 %>%
+  filter(distortion == "RF") %>%
+  group_by(log_freq, flanked, distortion, measure) %>%
+  summarise(y = mean(clutter))
+
+plt2 <- ggplot(plt_dat_2, aes(x = log_freq, y = y,
+                                   colour = flanked, shape = flanked)) +
+  facet_grid(measure ~ distortion) +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Clutter", breaks = c(0.5, 1, 1.5, 2, 2.5)) +
+  scale_x_continuous(name = "Frequency (c/2pi)", breaks = log(freq_breaks), labels = freq_breaks)
+
+plt2 <- plot_theme(plt2)
+
+plt2 <- plt2 + theme(panel.margin = unit(1, "lines"))
+
+grid.arrange(plt1, plt2)
+@
+
+
+<<cap-expt-1-clutter-rescaled, echo=FALSE, cache=TRUE>>=
+cap <- paste0("Clutter analysis for Experiment 1, flanked condition only.
+Different saturations show distortion amplitudes (with saturation increasing for higher
+distortion amplitudes).
+              ")
+@
+
+<<expt-1-clutter-rescaled, echo=FALSE, cache=TRUE, message=FALSE, fig.width=fig_width_1_col, fig.height=5, fig.cap=cap, fig.env="figure">>=
+
+freq_breaks <- c(1, 2, 4, 8, 16, 32)
+
+clutter_dat_1$log_freq <- log(clutter_dat_1$freq)
+
+# top panel ----------------------------------------------
+plt_dat_1 <- clutter_dat_1 %>%
+  filter(distortion == "BPN" & flanked == "flanked") %>%
+  group_by(log_freq, flanked, distortion, measure, amplitude) %>%
+  summarise(y = mean(clutter))
+
+plt1 <- ggplot(plt_dat_1, aes(x = log_freq, y = y,
+                              colour = factor(amplitude))) +
+  facet_grid(measure ~ distortion, scales = "free_y") +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Clutter") +
+  scale_x_continuous(name = "Frequency (c/deg)", breaks = log(freq_breaks), labels = freq_breaks)
+
+plt1 <- plot_theme(plt1, legend = FALSE)
+plt1 <- plt1 + scale_colour_brewer(type = "seq", palette = "Blues", guide = FALSE)
+plt1 <- plt1 + theme(panel.margin = unit(1, "lines"))
+
+# bottom panel ----------------------------------------------
+freq_breaks <- c(2, 4, 8, 12)
+
+plt_dat_2 <- clutter_dat_1 %>%
+  filter(distortion == "RF" & flanked == "flanked") %>%
+  group_by(log_freq, flanked, distortion, measure, amplitude) %>%
+  summarise(y = mean(clutter))
+
+plt2 <- ggplot(plt_dat_2, aes(x = log_freq, y = y,
+                                   colour = factor(amplitude))) +
+  facet_grid(measure ~ distortion, scales = "free_y") +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Clutter") +
+  scale_x_continuous(name = "Frequency (c/2pi)", breaks = log(freq_breaks), labels = freq_breaks)
+
+plt2 <- plot_theme(plt2, legend = FALSE)
+plt2 <- plt2 + scale_colour_brewer(type = "seq", palette = "Blues", guide = FALSE)
+plt2 <- plt2 + theme(panel.margin = unit(1, "lines"))
+
+grid.arrange(plt1, plt2)
+@
+
+
+<<cap-expt-2-clutter, echo=FALSE, cache=TRUE>>=
+cap <- paste0("Clutter analysis of Experiment 2.
+Increasing colour saturation corresponds to increasing distortion amplitudes.
+The feature congestion metric (FC) shows that clutter increases as the number of distorted flankers increase,
+but these patterns are dependent on the distortion amplitude.
+The subband entropy metric (SE) shows the reverse pattern.
+")
+@
+
+<<expt-2-clutter, echo=FALSE, cache=TRUE, message=FALSE, fig.width=fig_width_1_col, fig.height=5, fig.cap=cap, fig.env="figure">>=
+
+plt_dat_1 <- clutter_dat_2 %>%
+  filter(distortion == "BPN") %>%
+  group_by(n_dist_flanks, amplitude, measure, distortion) %>%
+  summarise(y = mean(clutter))
+
+plt1 <- ggplot(plt_dat_1, aes(x = n_dist_flanks, y = y, colour = factor(amplitude))) +
+  facet_grid(measure ~ distortion, scales = "free_y") +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Clutter") +
+  scale_x_continuous(name = "No. distorted flankers", breaks = c(0, 2, 4))
+
+plt1 <- plot_theme(plt1, legend = FALSE)
+plt1 <- plt1 + scale_color_brewer(type = "seq", palette = "Blues", guide = FALSE)
+plt1 <- plt1 + theme(panel.margin = unit(1, "lines"))
+
+## RF plot ---------------------
+plt_dat_2 <- clutter_dat_2 %>%
+  filter(distortion == "RF") %>%
+  group_by(n_dist_flanks, amplitude, measure, distortion) %>%
+  summarise(y = mean(clutter))
+
+plt2 <- ggplot(plt_dat_2, aes(x = n_dist_flanks, y = y, colour = factor(amplitude))) +
+  facet_grid(measure ~ distortion, scales = "free_y") +
+  geom_line() + geom_point() +
+  scale_y_continuous(name = "Clutter") +
+  scale_x_continuous(name = "No. distorted flankers", breaks = c(0, 2, 4))
+
+plt2 <- plot_theme(plt2, legend = FALSE)
+plt2 <- plt2 + scale_color_brewer(type = "seq", palette = "Blues", guide = FALSE)
+plt2 <- plt2 + theme(panel.margin = unit(1, "lines"))
+
+grid.arrange(plt1, plt2)
+@
+
+
+\subsection{Examples of stimuli}
+\label{sec:stimulus_examples}
+
+Here we provide additional examples of distortions applied to different target letters.
+Figure \ref{fig:bpn_letter_examples} shows examples for BPN distortions applied to each letter, and Figure
+\ref{fig:rf_letter_examples} show example letter distortions for the RF method.
+
+\begin{figure*}
+	\centering
+   \includegraphics[scale=1]{../figures/additional_letter_examples_BPN.pdf}
+   \caption{
+	Examples of Bandpass Noise distortions.
+	\textbf{A:} Letters (rows) distorted at the averaged unflanked threshold from Experiment 1.
+	Columns show increasing distortion frequencies.
+	\textbf{B:} Letters distorted at the averaged flanked threshold from Experiment 1.
+  \textbf{C:} Letters distorted at the maximum distortion used in Experiment 1.
+   }
+  \label{fig:bpn_letter_examples}
+\end{figure*}
+
+\begin{figure*}
+	\centering
+   \includegraphics[scale=1]{../figures/additional_letter_examples_RF.pdf}
+   \caption{
+	Examples of radial frequency distortions.
+	Panels as in Figure \ref{fig:bpn_letter_examples}.
+   }
+   \label{fig:rf_letter_examples}
+\end{figure*}
+
+\bibliography{letter_distortions.bib}
+\end{document}

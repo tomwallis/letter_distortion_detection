@@ -1,0 +1,113 @@
+# Documentation for materials accompanying "Detecting distortions of peripherally-presented letter stimuli under crowded conditions"
+
+Thomas Wallis, Saskia Tobias, Matthias Bethge & Felix Wichmann
+
+This document outlines the structure of the study materials we are providing, to assist with re-analysis or re-use attempts. It is not exhaustive. Unfortunately, our experiment pipeline involves a few different software packages and dependencies, so automating the entire pipeline (and sharing it) was not feasible. We have tried to make all necessary files and documents available here. Please let me (Tom) know if some crucial piece of information is missing! 
+
+**Note**: in the code, the BPN and RF distortions are labelled "Experiment 1" and "Experiment 2" respectively. In the manuscript these were all labelled "experiment 1". The data labelled "Experiment 2" (a, b, c) in the paper were labelled "Experiment 3a, 3b and 3c" in the code.
+
+## Software used
+
+* Matlab R2013b
+* Psychtoolbox v.3.0.11
+* ishow (see `/documentation/ishow.zip`, please reference http://dx.doi.org/10.5281/zenodo.34217)
+* psignifit v.01-beta (final versions available [here](https://github.com/wichmann-lab/psignifit))
+* Python 2.7.6. within the Anaconda Scientific Python Distribution 1.9.2. 
+* PsyUtils v.0.1.1 (see `/documentation/PsyUtils.zip` for version used here, or [here](https://github.com/tomwallis/PsyUtils) for latest).
+
+## Directory structure
+
+* `/code/` contains code for running experiments, generating stimuli and analysing data.
+* `/documentation/` contains this document and some accompanying packages.
+* `/figures/` contains figures from the paper.
+* `/raw-data/` contains raw `.csv` files output by the experiment scripts.
+* `/results/` contains processed results files (start here for re-analysis attempts).
+
+Confusingly, the stimuli used in the experiment (images shown to subjects, as well as undistorted versions for future model comparison) are stored in `/code/stimuli/`. I didn't move to their own directory in order to not break hard coded links.
+
+## Stimulus generation
+
+Stimuli were generated using Python and the PsyUtils package (also scikit-image). 
+
+#### experiment1.py
+Generate unflanked and flanked letter stimuli.  Generated images will be saved in the folder 'stimuli-out'                                                    
+
+#### experiment3a.py 
+Generate flanked letter stimuli with 0, 2, 4  distorted flankers. Generated images will  be saved in the folder 'stimuli-out'.
+
+#### experiment3b.py
+Generate flanked letter stimuli with an undistorted target and 4 distorted flankers and all non-targets distorted. Generated images will be saved in the folder 'stimuli-out'.
+
+#### experiment3c.py
+Generate flanked letter stimuli with 4 distorted flankers at a fixed high amplitude while the amplitude of the target varies. Generated images will be saved in the folder 'stimuli-out'.
+
+### Parameters for stimulus generation
+
+**distortiontype**: "bex" / "rf"
+**flankedtype**: true (flanked) / false (unflanked)
+**freqs**: number of frequencies to generate (actual values entered later)
+**amps**: number of amplitudes to generate (actual values entered later)
+**rep**: number of unique stimuli for each freq / amp
+**distflanks**: number of distorted flankers (0, 2, 4)
+
+
+## Experiments
+
+All experiments were run under Matlab using the Psychtoolbox and ishow toolbox. All paths are relative to the path where the experiment script is stored.
+
+#### distortion_practice
+Practice trials for observers, run before first experiment. 
+
+* image path: `../stimuli/practiceimg/distorted`
+* output path: `../../raw-data`
+
+
+#### distortionexp1and2
+Flanked / unflanked letter distortion detection experiment. Tests 6 frequencies and 7 amplitudes.
+
+* image path: `../stimuli/images/distorted`
+* output path: `../../raw-data`
+
+
+#### distortionexp3a
+Flanked letter distortion detection with either 0, 2 or 4 distorted flankers.
+Tests one frequency and 7 amplitudes.
+
+* image path: `../stimuli/exp3img0flankersdistorted/distorted`
+* image path: `../stimuli/exp3img2flankersdistorted/distorted`
+* image path: `../stimuli/exp3img4flankersdistorted/distorted` 
+* output path: `../../raw-data`
+
+#### distortionexp3b
+Flanked undistorted letter detection task with 4 distorted flankers and all non-targets being distorted. Tests one frequency with 7 amplitudes.
+
+* image path: `../stimuli/exp3bimg4flankersdistorted/distorted` 
+* output path: `../../raw-data`
+
+#### distortionexp3c
+Flanked letter distortion detection with either 0, 2 or 4 distorted flankers at fixed high amplitude, while the distortion amplitude of the target varies.Tests one frequency with 7 amplitudes.
+
+* image path: `../stimuli/exp3cimg4flankersdistorted/distorted` 
+* output path: `../../raw-data`
+
+
+## Analysis files
+
+#### threshold_data_replotting.ipynb
+An ipython notebook written by Tom to generate plots from the paper. This notebook uses the data from Saskia's thesis (fitting psignifit to get thresholds etc) stored at `/results/saskia_analysis/sensitivitydata/`. This is the main analysis script provided for reproducibility. The below scripts are provided but not guaranteed to have all included dependencies.
+
+#### peak_estimates.jasp
+A JASP (www.jasp-stats.org) file used to compute Bayes Factors for the peak estimates for the BPN distortions in Experiment 1.
+
+#### alldatainone.m
+Save all data files of either experiment 1 or 2 (bex or RF) in a single file (`/results/experiment_1/alldata.csv`).
+
+#### alldatainoneexp3.m
+Save all data files from experiment 3 in a single file (`/results/experiment_1/alldata.csv`).
+
+#### analysis.m
+Analyse results of Experiment 1 / 2 using psignifit. Estimates psychometric functions and outputs thresholds etc. 
+
+#### analysisexp3.m
+Analyse results of Experiment 3 using psignifit. Estimates psychometric functions and outputs thresholds etc. 
+

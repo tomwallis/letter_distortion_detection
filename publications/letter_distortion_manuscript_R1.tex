@@ -152,7 +152,7 @@ A successful model of form discrimination in humans would explain sensitivity to
 
 \subsection{Methods}
 
-Stimuli, data and code associated with this paper are available to download from \url{http://dx.doi.org/10.5281/zenodo.48574}.
+Stimuli, data and code associated with this paper are available to download from \url{http://dx.doi.org/10.5281/zenodo.159242}.
 This document was prepared using the \texttt{knitr} package \citep{xie_knitr_2013, xie_dynamic_2015} in the R statistical environment \citep{r_core_development_team_r:_2016,wickham_dplyr:_2016,wickham_ggplot2_2009,wickham_splitapplycombine_2011, auguie_gridextra:_2016, arnold_ggthemes:_2016} to increase its reproducibility.
 
 \subsubsection{Observers}
@@ -227,7 +227,7 @@ In total we generated 1920 images: two distortion types (BPN, RF) $\times$ two c
 BPN distortions are generated from new random noise images and RF distortions with random phases, meaning that these 10 repetitions were unique images.
 Target positions, letter identities and distortions were randomised on each repeat.
 In addition, we generated the same 1920 images \textit{without} applying distortion to one of the target letters and saved them to disk.
-An image-based model of pattern recognition could be evaluated on the same stimuli as we have shown to our observers, using an undistorted ``full-reference'' image as a baseline (all images are provided online at \url{http://dx.doi.org/10.5281/zenodo.48574}).
+An image-based model of pattern recognition could be evaluated on the same stimuli as we have shown to our observers, using an undistorted ``full-reference'' image as a baseline (all images are provided online at \url{http://dx.doi.org/10.5281/zenodo.159242}).
 
 \subsubsection{Procedure}
 
@@ -656,7 +656,7 @@ A successful model of form discrimination would need to explain sensitivity to t
 Directly comparing the BPN and RF distortions would require an image-based similarity metric that captured the perceptual size of the distortions on a common scale.
 One test of such a similarity metric would be to rescale the results of the BPN and RF data reported here such that the different sensitivity patterns as a function of distortion frequency overlap (assuming that they are detected by a common mechanism).
 The metric of feature congestion \citep{rosenholtz_measuring_2007} qualitatively captures some of these features (see Supplementary Material) and may present a useful starting point for a more complete model.
-We have provided our raw data and images of the stimuli used in these experiments (\url{http://dx.doi.org/10.5281/zenodo.48574}) to facilitate future efforts along these lines.
+We have provided our raw data and images of the stimuli used in these experiments (\url{http://dx.doi.org/10.5281/zenodo.159242}) to facilitate future efforts along these lines.
 
 
 \section{Acknowledgements}
@@ -709,7 +709,7 @@ Specifically, for BPN distortions we should observe a bandpass tuning of the rel
 We computed the Fourier amplitude spectrum of each target letter image ($92 \times 92$ pixels),
 then calculated the radial energy (averaging over angle) and angular energy (averaging over radius) by applying Gaussian sliding windows (using the
 \texttt{spectral\_analysis}
-function from Psyutils v1.3.1: \url{http://dx.doi.org/10.5281/zenodo.60212}).
+function from Psyutils v1.3.1: \url{http://dx.doi.org/10.5281/zenodo.159242}).
 These correspond to the spatial frequency and orientation energies respectively.
 We performed this operation for the undistorted target letters, and for letters distorted with BPN and RF distortions with frequencies as in Experiment 1 and for three distortion amplitudes: the amplitude corresponding to the average threshold for the unflanked condition, the flanked condition, and for the maximum distortion we applied in Experiment 1.
 Within each combination of conditions we generated 15 unique distorted letters (i.e. with different noise patterns for BPN and different phases for RF) in order to capture the average effect of the distortions.

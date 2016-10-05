@@ -43,10 +43,7 @@ The BPN distortion type showed evidence of tuning, with sensitivity to distortio
 The presence of flanking letters causes this peak to rise to approximately 8.5~c/deg.
 In contrast to the tuning observed for BPN distortions, RF distortion sensitivity increased as the radial frequency of distortion increased.
 In a series of follow-up experiments we found that sensitivity to distortions is reduced when flanking letters were also distorted, that this held when observers were required to report which target letter was \textit{un}distorted, and that this held when flanker distortions were always detectable.
-%These results seem to provide further support for feature averaging models of crowding, because the presence of distorted flanking features makes it more likely that target features also appear distorted (through averaging).
-%These results argue against any effect of popout for a distorted letter amongst undistorted flankers.
 The perception of geometric distortions in letter stimuli is impaired by visual crowding.
-A metric of visual clutter may provide useful directions for future modelling work.
 %%
 }
 
@@ -55,14 +52,13 @@ A metric of visual clutter may provide useful directions for future modelling wo
 Correspondence should be addressed to TSAW: thomas.wallis@uni-tuebingen.de.
 TSAW was supported by an Alexander von Humboldt Postdoctoral Fellowship.
 Funded, in part, by the German Federal Ministry of Education and Research (BMBF) through the Bernstein Computational Neuroscience Program T\"{u}bingen (FKZ: 01GQ1002), the German Excellency Initiative through the Centre for Integrative Neuroscience T\"{u}bingen (EXC307), and the German Science Foundation (DFG; priority program 1527, BE 3848/2-1). \\
-Word count: 6030 (excluding references and captions). \\
-Number of figures: 6 (main text), 12 (supplementary material).
+Word count: 5950 (excluding references and captions). \\
+Number of figures: 5 (main text), 11 (supplementary material).
 }
 
 \begin{document}
-\linenumbers
-
 \maketitle
+\linenumbers
 
 <<setup, echo=FALSE, results='hide', message=FALSE>>=
 library(plyr)
@@ -173,7 +169,7 @@ This document was prepared using the \texttt{knitr} package \citep{xie_knitr_201
 \subsubsection{Observers}
 
 Five observers with normal or corrected-to-normal vision participated in this experiment: two of the authors, one lab member and two paid observers (10 Euro per hour) who were unaware of the purpose of the study. All of the observers had prior experience with psychophysical experiments and were between 20 an 31 years of age.
-All experiments conformed to the Declaration of Helsinki.
+All experiments conformed to Standard 8 of the American Psychological Association's Ethical Principles of Psychologists and Code of Conduct (2010).
 
 \subsubsection{Apparatus}
 
@@ -835,36 +831,6 @@ Flanker distortion increases complexity, making the task more difficult.
 Letter complexity effects have indeed been demonstrated to play a distinct role from target-flanker similarity in crowded letter identification \citep{bernard_dependence_2011}, an effect attributed to the number of features to be detected within a character \citep[see also][]{pelli_feature_2006, suchow_learning_2012}.
 It seems plausible then that in our Experiment 2, it is difficult to detect distorted letters in the presence of distorted flankers because of feature crowding.
 
-<<cap-clutter-1, echo=FALSE, cache=TRUE>>=
-cap <- paste0("An image-based clutter metric \\citep[feature congestion;][]{rosenholtz_measuring_2007} applied to stimuli from Experiment 2a.
-Higher values of the metric correspond to more cluttered images.
-Points show the clutter value averaged over letters and unique stimuli for the highest amplitudes shown to observers.
-For this amplitude, clutter increases with the number of distorted flankers, qualitatively mirroring the human data in Figure \\ref{fig:expt-2-results}.
-As more flankers are distorted, the image becomes more cluttered (``complex'') and human performance declines (though these clutter patterns depend on distortion amplitude; see Supplementary Material).
-")
-@
-
-<<clutter-1, echo=FALSE, cache=TRUE, fig.width=fig_width_1_col, fig.height=2, fig.cap=cap, fig.env="figure">>=
-# this file output by code/analysis/data_munging_clutter_results:
-load(file.path(top_dir, "results", "clutter_analysis", "clutter_data.RData"))
-
-plt_dat <- clutter_dat_2 %>%
-  filter((amplitude == 7.0 | amplitude == 0.5) & measure == "FC") %>%
-  group_by(n_dist_flanks, distortion) %>%
-  summarise(y = mean(clutter))
-
-plt <- ggplot(plt_dat, aes(x = n_dist_flanks, y = y)) +
-  facet_grid(~ distortion) +
-  geom_line() + geom_point() +
-  scale_y_continuous(name = "Feature congestion") +
-  scale_x_continuous(name = "No. distorted flankers", breaks = c(0, 2, 4))
-
-plt <- plot_theme(plt, legend = FALSE)
-plt <- plt + theme(panel.margin = unit(1, "lines"))
-plt
-@
-
-
 % clutter:
 The model of letter complexity presented by \citet{bernard_dependence_2011} requires a letter skeleton to be known (their paper compared different fonts).
 We require an image-based metric.
@@ -872,23 +838,11 @@ We made a coarse attempt to quantify the complexity account above by investigati
 \textit{Feature congestion} is a multiscale measure of the covariance of the luminance contrast, orientation and colour in a given input image.
 \textit{Subband entropy} is determined by the bitdepth required for wavelet image encoding, expressed as Shannon entropy in bits.
 These metrics have previously been associated with performance in tasks such as visual search \citep{asher_regional_2013, henderson_influence_2009, rosenholtz_measuring_2007}.
-
-Intriguingly, the feature congestion metric does qualitatively mimic the pattern of results observed in Experiment 2a (Figure \ref{fig:clutter-1}): distorting flanking letters increases the clutter of the display, similarly to the increased thresholds for humans in Figure \ref{fig:expt-2-results}.
-In addition, with a few caveats, feature congestion loosely matches the pattern of human sensitivity as a function of distortion frequency from Experiment 1 (Supplementary Material).
-Note however that these patterns represent only a relatively tiny change in the metric (at maximum a value of $\approx 0.03$), whereas adding flanking letters increases the metric by about 1 compared to an unflanked display (see Supplementary Material).
-This is clearly out-of-scale for the relatively large threshold increases in Experiment 2a.
-Nevertheless, integrating the feature congestion clutter metric might be useful in efforts to model our results more comprehensively.
+While both metrics showed a robust increase in clutter from unflanked to flanked displays, there was only weak evidence that they were able to capture the other effects in our data (see Supplementary Material).
+One would need to find a more appropriate measure of complexity---perhaps something similar to these clutter metrics---to capture the full range of the data we report.
 
 % averaging vs substitution:
 Two dominant classes of crowding models are ``averaging'' models, in which crowding occurs because task-relevant features from the target and flankers are averaged together, and ``substitution'' models in which properties of the flankers are sometimes mistakenly reported as properties of the target.
-% An averaging account of our experiments might predict that undistorted contours of the non-target middle letters will appear more distorted by virtue of lying nearby the distorted flankers (e.g. in Experiment 2c), thus reducing the perceived difference between distorted and undistorted middle letters and reducing performance.
-% In other words, the mechanism(s) that cause crowding make the targets \textit{appear} more like the flankers \citep{greenwood_crowding_2010}.
-% Increasing the number of distorted flankers (as in Experiment 2a) also reduces the difference signal available, if averaging depends on the number of nearby distorted contours.
-% In contrast, a substitution model might hold that observers encode the target and flanker features (in this case, distortedness) accurately, but will sometimes confuse the flankers and the target and thus report the flanker characteristic on some trials.
-% Our results therefore seem more consistent with averaging than with substitution models of crowding.
-% A substitution model could account for our results if the substituting observer \textit{only} has access to the distortedness of the four letters perceived to be at the target location (whether or not these are targets or substituted flankers).
-% A more realistic assumption would be that the observer can tell whether flanker letters are also distorted.
-% In this case, the observer should be able to respond correctly because they would know which array of five letters contains the oddball letter, irrespective of whether a flanker is substituted for a target.
 The present study was not designed to discriminate between these accounts of crowding, and it is somewhat unclear what predictions models of either class would make for our results (can the appearance of distortion be substituted?).
 Interestingly, recent work shows that because both averaging- and substitution-like errors can be accounted for under a simple population coding model and decision criterion, observing either of these behaviours experimentally does not necessarily discriminate between mechanisms \citep[at least for orientation discrimination; ][]{harrison_unifying_2015}.
 It may be fruitful to consider what such a letter-agnostic population coding model might predict for our experiments.
@@ -974,7 +928,6 @@ Taken together, the pattern of results presented here provide a challenge for mo
 A successful model of form discrimination would need to explain sensitivity to two distinct distortion types, the dependence of distortion sensitivity on flanking letters, and the dependence on the type of flanking letters (distorted flankers reduce sensitivity).
 Directly comparing the BPN and RF distortions would require an image-based similarity metric that captured the perceptual size of the distortions on a common scale.
 One test of such a similarity metric would be to rescale the results of the BPN and RF data reported here such that the different sensitivity patterns as a function of distortion frequency overlap (assuming that they are detected by a common mechanism).
-The metric of feature congestion \citep{rosenholtz_measuring_2007} qualitatively captures some of these features (see Supplementary Material) and may present a useful starting point for a more complete model.
 We have provided our raw data and images of the stimuli used in these experiments (\url{http://dx.doi.org/10.5281/zenodo.159242}) to facilitate future efforts along these lines.
 
 
@@ -1154,55 +1107,6 @@ plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "seq", palette = 
 
 plt
 @
-
-<<sf-energy-bpn-diff, echo=FALSE, cache=TRUE, fig.width=fig_width_2_col, fig.height=4.3, fig.cap=cap, message=FALSE, fig.env="figure*">>=
-# x_labels <- c(1, 2, 4, 8, 16)  # cycles per degree
-# x_breaks <- x_labels * (92 / 41.5)
-#
-# # testing:
-# # test_set <- sf_energy %>%
-# #   filter(distortion != "RF" & flanked == "max" & freq == 21.3 & letter == "K")
-# #
-# # blah <- test_set %>%
-# #   group_by(flanked, freq, letter, x) %>%
-# #   mutate(diff = y - y[rep == -1])
-#
-# # holy moly dplyr is awesome:
-# # takes the difference between the undistorted and other
-# # traces, then averages over reps:
-# # plot_dat <- sf_energy %>%
-# #   filter(distortion != "RF") %>%
-# #   group_by(flanked, freq, letter, x) %>%
-# #   mutate(diff = y - y[rep == -1]) %>%
-# #   filter(letter_type == "Distorted")
-#
-# # ratio of energies:
-# plot_dat <- sf_energy %>%
-#   filter(distortion != "RF") %>%
-#   group_by(flanked, freq, letter, x) %>%
-#   mutate(diff = y / y[rep == -1]) %>%
-#   filter(letter_type == "Distorted")
-#
-# plt <- ggplot(plot_dat, aes(x = x, y = diff, colour = flanked)) +
-#   facet_grid(letter ~ freq) +
-#   geom_hline(yintercept = 1, linetype = "dotted", colour = "black")
-#
-# # a line for every rep?
-# for (i in 0 : 14){
-#   this_dat <- plot_dat %>% filter(rep == i)
-#   plt <- plt + geom_line(data = this_dat, alpha = 0.4)
-# }
-#
-# plt <- plt +
-#   scale_x_log10(name = "Spatial frequency (c/deg)", breaks = x_breaks, labels = x_labels) +
-#   scale_y_continuous(name = "Contrast energy ratio (distorted / undistorted)")
-#
-# plt <- plot_theme(plt) + scale_colour_brewer(name = "", type = "seq", palette = "OrRd") +
-#   theme(legend.position = "top")
-#
-# plt
-@
-
 
 <<cap-sf-energy-rf, echo=FALSE>>=
 cap <- paste0("Spatial frequency energy in letter stimuli with RF distortions. Plot elements
@@ -1424,39 +1328,31 @@ plt
 \subsection{Clutter metric analysis}
 
 In an attempt to provide some quantitative basis for our speculations about display complexity as an account for the results of our second experiment, we here apply two metrics for ``clutter'' to our stimulus displays \citep{rosenholtz_measuring_2007}.
-The first metric, \textit{feature congestion}, is a multiscale measure of the covariance of three features: the luminance contrast, orientation and colour in a given input image.
+The first metric, \textit{feature congestion}, is a multiscale measure of the covariance of three features: the luminance contrast, orientation and colour in a given input image (since our images are greyscale, the contribution of colour will be minimal).
 The second metric, \textit{subband entropy}, is determined by the bitdepth required for wavelet image encoding, expressed as Shannon entropy in bits.
 For both metrics, higher values are associated with more ``cluttered'' images.
 These metrics have been shown to be predictive of aspects of visual search performance across a variety of domains \citep{asher_regional_2013, henderson_influence_2009, rosenholtz_measuring_2007}.
 
-To assess clutter in our displays we used the publically-available code from \citet[][see \url{https://dspace.mit.edu/handle/1721.1/37593}]{rosenholtz_measuring_2007}.
+We used the publically-available code from \citet[][see \url{https://dspace.mit.edu/handle/1721.1/37593}]{rosenholtz_measuring_2007}.
 We analysed all the images used in both experiments.
 In all cases we report the scalar clutter metric (averaged over space in the image to give one number per stimulus display).
 Figure \ref{fig:expt-1-clutter} shows the results for Experiment 1.
 While both metrics qualitatively reproduce the effect of adding flanking letters (clutter increases in the ``flanked'' condition), neither metric produces the qualitative pattern of results as a function of frequency (bandpass patterns for BPN distortions or decreasing clutter as frequency increases for RF distortions), at least at the scale of the increase caused by adding flanking letters.
 
-In Figure \ref{fig:expt-1-clutter-rescaled} we plot only the flanked condition, and separate the clutter values according to distortion amplitude.
-This rescaling allows us to see several potentially interesting patterns in the feature congestion results (subband entropy shows little evidence of any pattern consistent with human data).
-For the RF distortions at high amplitudes, clutter increases as a function of distortion frequency (except for a dip at $4 c/2\pi$, which there is also some weak evidence for in the human data).
-Feature congestion in the BPN condition for high amplitudes shows some evidence of bandpass tuning (though peaking at lower frequencies than the peaks in the human data).
-If humans are sensitive to differences in feature congestion on this scale, they might perform the task by picking the most ``cluttered'' of the four letter arrays (and thus, higher clutter leads to better performance).
-In other words, inverting the feature congestion patterns shows a loose qualitative relationship to the shape of human thresholds as a function of distortion frequency.
+In Figure \ref{fig:expt-1-clutter-rescaled} we plot only the flanked condition for the highest distortion amplitude.
+While one could optimistically see interesting patterns in the means of the FC clutter metric at this scale (apart from the dip at $4 c/2\pi$, RF clutter increases with frequency, whereas BPN clutter shows hints of a bandpass shape, albeit at a lower peak than the human data), the large variance for individual images provides at best weak evidence for any correspondence with the human data from Experiment 1.
 
 Can the clutter metrics account for the influence of the number of distorted flankers (Experiment 2)?
-The change in clutter caused by applying distortions to zero, two or four flankers is shown in Figure \ref{fig:expt-2-clutter}.
-The feature congestion metric shows a similar pattern of results as humans for high distortion amplitudes.
-That this holds only for high distortion amplitudes is not surprising because for low amplitudes both the target and the flankers are hardly altered (recall that in Experiment 2a flanker distortion and target distortions were yoked).
-However, note that this implies the opposite relationship to thresholds as for the discussion of clutter metrics applied to Experiment 1.
-That is, here thresholds increase as clutter increases, whereas for Experiment 1 they decrease.
-When detecting a distorted target amongst undistorted letters (Experiment 1), observers may pick the more cluttered letter array as containing the target, and thus more clutter is associated with better performance.
-When detecting a distorted target amongst distorted flankers (Experiment 2a), more clutter (caused primarily by the four distorted flankers, which are uninformative about the target location) is conversely associated with worse performance.
-If observers apply the same strategy in both experiments, the additional clutter caused by distorted flankers may make the clutter signal of the target less visible (a form of crowding).
+The change in clutter caused by applying distortions to zero, two or four flankers is shown in Figure \ref{fig:expt-2-clutter} (stimuli from Experiment 2a).
+The means of the feature congestion metric show a similar pattern of results as humans.
+This could imply that when detecting a distorted target amongst distorted flankers (Experiment 2a), more clutter (caused primarily by the four distorted flankers, which are uninformative about the target location) is associated with worse performance.
+While this could be taken as quantitative support for our suggestion that performance in Experiment 2 can be explained by display complexity, we would advise not to take this interpretation too seriously for the following reasons:
+first, the scale of the clutter changes here is tiny compared to the influence of adding flanking letters in the first place (whereas human threshold changes are both very robust).
+Second, as for the data for Experiment 1 (Figure \ref{fig:expt-1-clutter-rescaled}), there is a large amount of variation in the individual images (presumably related to different configurations of target and flanking letters rather than effects of distortions per se).
 
-Taken together, these results suggest that investigating feature congestion as a metric for building a more comprehensive model of our task might be fruitful.
-One potential problem is that the scale of the clutter changes corresponding to patterns of frequency (Experiment 1) or distorted flankers (Experiment 2) is tiny compared to the influence of adding flanking letters in the first place.
-A better model would need to account for these changes to predict thresholds.
+Taken together, these results suggest that while image-based clutter metrics such as feature congestion or subband entropy account for the difference between the ``unflanked'' and ``flanked'' conditions of Experiment 1, one would need to find a more appropriate measure of complexity, or at least apply some transform to feature congestion, to capture the more subtle dependencies in our data.
 
-<<cap-expt-1-clutter, echo=FALSE, cache=TRUE>>=
+ <<cap-expt-1-clutter, echo=FALSE, cache=TRUE>>=
 cap <- paste0("Clutter analysis of Experiment 1.
             Feature congestion (FC) and subband entropy (SE) clutter metrics for our BPN and RF distortion
 images as a function of distortion frequency and flanked / unflanked display.
@@ -1465,6 +1361,13 @@ clutter at this scale), letters and unique stimuli.
 Flanking letters substantially increase visual clutter.
               ")
 @
+
+<<load_clutter_data, echo=FALSE, cache=TRUE>>=
+# this file output by code/analysis/data_munging_clutter_results:
+load(file.path(top_dir, "results", "clutter_analysis", "clutter_data.RData"))
+
+@
+
 
 <<expt-1-clutter, echo=FALSE, cache=TRUE, fig.width=fig_width_1_col, fig.height=5, fig.cap=cap, fig.env="figure">>=
 
@@ -1512,13 +1415,17 @@ grid.arrange(plt1, plt2)
 
 
 <<cap-expt-1-clutter-rescaled, echo=FALSE, cache=TRUE>>=
-cap <- paste0("Clutter analysis for Experiment 1, flanked condition only.
-Different saturations show distortion amplitudes (with saturation increasing for higher
-distortion amplitudes).
+cap <- paste0("Clutter analysis for Experiment 1, flanked condition at the highest
+distortion amplitude.
+  Each small semitransparent circular point represents one image from the experiment (these have been jittered on the x-axis to reduce overplotting).
+  Filled circles linked by lines represent mean clutter ($\\pm 1$ SEM).
               ")
 @
 
 <<expt-1-clutter-rescaled, echo=FALSE, cache=TRUE, message=FALSE, fig.width=fig_width_1_col, fig.height=5, fig.cap=cap, fig.env="figure">>=
+
+mean_sizes <- 0.1
+image_sizes <- 0.5
 
 freq_breaks <- c(1, 2, 4, 8, 16, 32)
 
@@ -1527,13 +1434,15 @@ clutter_dat_1$log_freq <- log(clutter_dat_1$freq)
 # top panel ----------------------------------------------
 plt_dat_1 <- clutter_dat_1 %>%
   filter(distortion == "BPN" & flanked == "flanked") %>%
-  group_by(log_freq, flanked, distortion, measure, amplitude) %>%
-  summarise(y = mean(clutter))
+  filter(amplitude == 5.0) %>%
+  group_by(log_freq, flanked, distortion, measure, amplitude)
 
-plt1 <- ggplot(plt_dat_1, aes(x = log_freq, y = y,
-                              colour = factor(amplitude))) +
+plt1 <- ggplot(plt_dat_1, aes(x = log_freq, y = clutter)) +
   facet_grid(measure ~ distortion, scales = "free_y") +
-  geom_line() + geom_point() +
+  geom_point(position = position_jitter(width=0.1), alpha = 0.5,
+             size = image_sizes) +
+  stat_summary(fun.data = "mean_se", geom = "line") +
+  stat_summary(fun.data = "mean_se", size = mean_sizes) +
   scale_y_continuous(name = "Clutter") +
   scale_x_continuous(name = "Frequency (c/deg)", breaks = log(freq_breaks), labels = freq_breaks)
 
@@ -1546,13 +1455,15 @@ freq_breaks <- c(2, 4, 8, 12)
 
 plt_dat_2 <- clutter_dat_1 %>%
   filter(distortion == "RF" & flanked == "flanked") %>%
-  group_by(log_freq, flanked, distortion, measure, amplitude) %>%
-  summarise(y = mean(clutter))
+  filter(amplitude == 0.32) %>%
+  group_by(log_freq, flanked, distortion, measure, amplitude)
 
-plt2 <- ggplot(plt_dat_2, aes(x = log_freq, y = y,
-                                   colour = factor(amplitude))) +
+plt2 <- ggplot(plt_dat_2, aes(x = log_freq, y = clutter)) +
   facet_grid(measure ~ distortion, scales = "free_y") +
-  geom_line() + geom_point() +
+  geom_point(position = position_jitter(width=0.1), alpha = 0.5,
+             size = image_sizes) +
+  stat_summary(fun.data = "mean_se", geom = "line") +
+  stat_summary(fun.data = "mean_se", size = mean_sizes) +
   scale_y_continuous(name = "Clutter") +
   scale_x_continuous(name = "Frequency (c/2pi)", breaks = log(freq_breaks), labels = freq_breaks)
 
@@ -1565,11 +1476,9 @@ grid.arrange(plt1, plt2)
 
 
 <<cap-expt-2-clutter, echo=FALSE, cache=TRUE>>=
-cap <- paste0("Clutter analysis of Experiment 2.
-Increasing colour saturation corresponds to increasing distortion amplitudes.
-The feature congestion metric (FC) shows that clutter increases as the number of distorted flankers increase,
-but these patterns are dependent on the distortion amplitude.
-The subband entropy metric (SE) shows the reverse pattern.
+cap <- paste0("Clutter analysis of Experiment 2a.
+Results are shown for the highest distortion amplitudes only.
+Plot elements as in Figure \\ref{fig:expt-1-clutter-rescaled}.
 ")
 @
 
@@ -1577,12 +1486,15 @@ The subband entropy metric (SE) shows the reverse pattern.
 
 plt_dat_1 <- clutter_dat_2 %>%
   filter(distortion == "BPN") %>%
-  group_by(n_dist_flanks, amplitude, measure, distortion) %>%
-  summarise(y = mean(clutter))
+  filter(amplitude == 5.0) %>%
+  group_by(n_dist_flanks, amplitude, measure, distortion)
 
-plt1 <- ggplot(plt_dat_1, aes(x = n_dist_flanks, y = y, colour = factor(amplitude))) +
+plt1 <- ggplot(plt_dat_1, aes(x = n_dist_flanks, y = clutter)) +
   facet_grid(measure ~ distortion, scales = "free_y") +
-  geom_line() + geom_point() +
+  geom_point(position = position_jitter(width=0.2), alpha = 0.5,
+             size = image_sizes) +
+  stat_summary(fun.data = "mean_se", geom = "line") +
+  stat_summary(fun.data = "mean_se", size = mean_sizes) +
   scale_y_continuous(name = "Clutter") +
   scale_x_continuous(name = "No. distorted flankers", breaks = c(0, 2, 4))
 
@@ -1593,12 +1505,15 @@ plt1 <- plt1 + theme(panel.margin = unit(1, "lines"))
 ## RF plot ---------------------
 plt_dat_2 <- clutter_dat_2 %>%
   filter(distortion == "RF") %>%
-  group_by(n_dist_flanks, amplitude, measure, distortion) %>%
-  summarise(y = mean(clutter))
+  filter(amplitude == 0.5) %>%
+  group_by(n_dist_flanks, amplitude, measure, distortion)
 
-plt2 <- ggplot(plt_dat_2, aes(x = n_dist_flanks, y = y, colour = factor(amplitude))) +
+plt2 <- ggplot(plt_dat_2, aes(x = n_dist_flanks, y = clutter)) +
   facet_grid(measure ~ distortion, scales = "free_y") +
-  geom_line() + geom_point() +
+  geom_point(position = position_jitter(width=0.2), alpha = 0.5,
+             size = image_sizes) +
+  stat_summary(fun.data = "mean_se", geom = "line") +
+  stat_summary(fun.data = "mean_se", size = mean_sizes) +
   scale_y_continuous(name = "Clutter") +
   scale_x_continuous(name = "No. distorted flankers", breaks = c(0, 2, 4))
 
